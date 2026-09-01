@@ -1,1 +1,387 @@
 @import "tailwindcss";
+
+/* Creatorius - Estilos sofisticados y modernos */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=VT323&family=Eater&display=swap');
+
+/* Variables de color */
+:root {
+  --primary-color: #6366f1;
+  --secondary-color: #8b5cf6;
+  --accent-color: #a855f7;
+  --bg-dark: #0a0a0f;
+  --bg-card: rgba(20, 20, 30, 0.9);
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --glow-color: rgba(99, 102, 241, 0.5);
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Caveat', cursive;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Fondo animado con patrón */
+.background-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
+  animation: backgroundPulse 15s ease-in-out infinite;
+}
+
+.background-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+/* Contenedor principal */
+.creatorius-container {
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+}
+
+/* Sección del título con runas */
+.title-section {
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.runes-text {
+  font-family: 'Eater', cursive;
+  font-size: 2rem;
+  color: var(--secondary-color);
+  text-shadow: 0 0 20px var(--glow-color);
+  letter-spacing: 0.3em;
+  animation: runesGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes runesGlow {
+  from {
+    text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
+    opacity: 0.7;
+  }
+  to {
+    text-shadow: 0 0 20px var(--glow-color), 0 0 40px var(--glow-color), 0 0 60px var(--glow-color);
+    opacity: 1;
+  }
+}
+
+.animate-runes {
+  animation: runesFadeOut 1s ease-out forwards;
+  animation-delay: 2s;
+}
+
+@keyframes runesFadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(10px);
+  }
+}
+
+.main-title {
+  font-family: 'VT323', monospace;
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  text-shadow: 0 0 30px var(--primary-color);
+  animation: titleFadeIn 1.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes titleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Contenedor del poema */
+.poem-container {
+  display: flex;
+  justify-content: center;
+  gap: 6rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.poem-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 350px;
+}
+
+.poem-line {
+  font-family: 'Caveat', cursive;
+  font-size: 1.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.5s ease;
+}
+
+.poem-line.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.cursor {
+  animation: blink 1s step-end infinite;
+  color: var(--accent-color);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Tarjeta de identificación */
+.card-container {
+  perspective: 1000px;
+  margin-top: 2rem;
+}
+
+.id-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.id-card {
+  width: 500px;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(99, 102, 241, 0.2),
+    inset 0 0 60px rgba(99, 102, 241, 0.05);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+}
+
+.id-card:hover {
+  transform: rotateY(10deg) rotateX(5deg) scale(1.02);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 80px rgba(99, 102, 241, 0.4),
+    inset 0 0 80px rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.6);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 20px var(--glow-color);
+  transition: all 0.3s ease;
+}
+
+.id-card:hover .profile-photo {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 0 30px var(--primary-color);
+}
+
+.name-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.card-name {
+  font-family: 'VT323', monospace;
+  font-size: 2.5rem;
+  color: var(--text-primary);
+  margin: 0;
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+.card-desde {
+  font-family: 'VT323', monospace;
+  font-size: 1.3rem;
+  color: var(--secondary-color);
+  margin: 0.2rem 0 0 0;
+}
+
+.logo-section {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.licuado-logo {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px var(--glow-color));
+  transition: all 0.3s ease;
+}
+
+.id-card:hover .licuado-logo {
+  filter: drop-shadow(0 0 20px var(--accent-color));
+  transform: scale(1.05);
+}
+
+.card-description {
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-align: justify;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  border-left: 3px solid var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+
+  .poem-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .poem-column {
+    min-width: auto;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .poem-line {
+    font-size: 1.5rem;
+    white-space: normal;
+  }
+
+  .id-card {
+    width: 100%;
+    max-width: 450px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .name-section {
+    align-items: center;
+  }
+}
+
+/* Animaciones adicionales para partículas flotantes */
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 10s infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
