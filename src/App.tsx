@@ -130,7 +130,7 @@ export default function App() {
           <div className="poem-column poem-column-1">
             {poem1Lines.map((line, index) => (
               <p key={index} className={`poem-line ${index < currentLine1 ? 'visible' : ''}`}>
-                {typedPoem1.split('\n')[index] || ''}
+                {typedPoem1[index] || ''}
                 {index === currentLine1 - 1 && isTyping1 && <span className="cursor">|</span>}
               </p>
             ))}
@@ -140,7 +140,7 @@ export default function App() {
           <div className="poem-column poem-column-2">
             {poem2Lines.map((line, index) => (
               <p key={index} className={`poem-line ${index < currentLine2 ? 'visible' : ''}`}>
-                {typedPoem2.split('\n')[index] || ''}
+                {typedPoem2[index] || ''}
                 {index === currentLine2 - 1 && currentLine1 >= poem1Lines.length && <span className="cursor">|</span>}
               </p>
             ))}
@@ -176,6 +176,14 @@ export default function App() {
               <p className="card-description">
                 Soy por ahora, el único miembro de LICUADO, un estudio de videojuegos con más ambición que personal, y esa frase es literal. La cosa es que necesito fondos para hacer despegar este proyecto, ya que mi cuenta bancaria en este momento en que escribo esto está literalmente en 0. Pero no pienso esperar, ni dejar que esta llama se apague, así que por eso te ofrezco este servicio, en el que por dinero te hago una web como tu la quieras, con alta calidad y todo eso.
               </p>
+              
+              {/* Sello ABIERTO A NEGOCIAR */}
+              <div className="negotiation-stamp">
+                <p className="stamp-text">ABIERTO A NEGOCIAR</p>
+              </div>
+              
+              {/* Espacio para botón futuro */}
+              <div className="button-placeholder"></div>
             </div>
           </a>
         </div>
