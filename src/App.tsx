@@ -2,20 +2,19 @@ import { useState, useEffect } from 'react';
 import './index.css';
 
 export default function App() {
-  const [showRunes, setShowRunes] = useState(true);
+  const [displayTitle, setDisplayTitle] = useState('');
   const [showTitle, setShowTitle] = useState(false);
-  const [typedPoem1, setTypedPoem1] = useState('');
-  const [typedPoem2, setTypedPoem2] = useState('');
+  const [typedPoem1, setTypedPoem1] = useState<string[]>([]);
+  const [typedPoem2, setTypedPoem2] = useState<string[]>([]);
   const [currentLine1, setCurrentLine1] = useState(0);
   const [currentLine2, setCurrentLine2] = useState(0);
   const [isTyping1, setIsTyping1] = useState(false);
   const [isTyping2, setIsTyping2] = useState(false);
-
+  
   // Runas nórdicas antiguas que significan: "Creo tu idea con la delicadeza de un dios creando un mundo. ¿Acaso no lo soy?"
-  // Estas runas están en Nórdico Antiguo (Old Norse) usando el alfabeto Futhark
   const runesText = "ᚠᚱᛖᚷᚾᚨ ᛁᚦᛖᚨ ᚹᛁᚦ ᚦᛖ ᚦᛖᚾᛖᚱᚾᛖᛋᛋ ᚨᚢ ᚨ ᚷᛟᛞ ᚲᚱᛖᚨᛏᛁᚾᚷ ᚨ ᚹᛟᚱᛚᛞ ᛫ ᛁᛋ ᚦᚨᛏ ᚾᛟᛏ ᚹᚺᚨᛏ ᛁ ᚨᛗ?";
   const titleText = "Háblame de tu idea,\ny será real\nantes de lo que esperas";
-
+  
   const poem1Lines = [
     "Describe tu proyecto,",
     "y yo lo construyo sin pretextos,",
@@ -34,66 +33,75 @@ export default function App() {
     "como tu idea entre mis manos y el teclado"
   ];
 
-  // Animación de runas a título
+  // Animación de runas a título - conversión carácter por carácter
   useEffect(() => {
-    const runesTimer = setTimeout(() => {
-      setShowRunes(false);
-      setShowTitle(true);
-    }, 3000);
+    let runeIndex = 0;
+    const titleChars = titleText.split('');
+    
+    const convertInterval = setInterval(() => {
+      if (runeIndex < titleChars.length) {
+        setDisplayTitle(prev => prev + titleChars[runeIndex]);
+        runeIndex++;
+      } else {
+        clearInterval(convertInterval);
+        setTimeout(() => {
+          setShowTitle(true);
+        }, 500);
+      }
+    }, 80);
 
-    return () => clearTimeout(runesTimer);
+    return () => clearInterval(convertInterval);
   }, []);
 
   // Animación de escritura del poema 1
   useEffect(() => {
-    if (showTitle && currentLine1 < poem1Lines.length) {
-      setIsTyping1(true);
-      let charIndex = 0;
-      const currentLine = poem1Lines[currentLine1];
-      
-      const typeInterval = setInterval(() => {
-        if (charIndex < currentLine.length) {
-          setTypedPoem1(prev => {
-            const lines = prev.split('\n');
-            lines[currentLine1] = (lines[currentLine1] || '') + currentLine[charIndex];
-            return lines.join('\n');
-          });
-          charIndex++;
-        } else {
-          clearInterval(typeInterval);
-          setIsTyping1(false);
-          setCurrentLine1(prev => prev + 1);
-        }
-      }, 50);
+    if (!showTitle || currentLine1 >= poem1Lines.length || isTyping1) return;
+    
+    setIsTyping1(true);
+    let charIndex = 0;
+    const currentLine = poem1Lines[currentLine1];
+    
+    const typeInterval = setInterval(() => {
+      if (charIndex < currentLine.length) {
+        setTypedPoem1(prev => {
+          const newLines = [...prev];
+          newLines[currentLine1] = (newLines[currentLine1] || '') + currentLine[charIndex];
+          return newLines;
+        });
+        charIndex++;
+      } else {
+        clearInterval(typeInterval);
+        setIsTyping1(false);
+        setCurrentLine1(prev => prev + 1);
+      }
+    }, 50);
 
-      return () => clearInterval(typeInterval);
-    } else if (currentLine1 >= poem1Lines.length && !isTyping2) {
-      setIsTyping2(true);
-    }
+    return () => clearInterval(typeInterval);
   }, [showTitle, currentLine1]);
 
   // Animación de escritura del poema 2
   useEffect(() => {
-    if (currentLine1 >= poem1Lines.length && currentLine2 < poem2Lines.length) {
-      let charIndex = 0;
-      const currentLine = poem2Lines[currentLine2];
-      
-      const typeInterval = setInterval(() => {
-        if (charIndex < currentLine.length) {
-          setTypedPoem2(prev => {
-            const lines = prev.split('\n');
-            lines[currentLine2] = (lines[currentLine2] || '') + currentLine[charIndex];
-            return lines.join('\n');
-          });
-          charIndex++;
-        } else {
-          clearInterval(typeInterval);
-          setCurrentLine2(prev => prev + 1);
-        }
-      }, 50);
+    if (currentLine1 < poem1Lines.length || currentLine2 >= poem2Lines.length || isTyping2) return;
+    
+    setIsTyping2(true);
+    let charIndex = 0;
+    const currentLine = poem2Lines[currentLine2];
+    
+    const typeInterval = setInterval(() => {
+      if (charIndex < currentLine.length) {
+        setTypedPoem2(prev => {
+          const newLines = [...prev];
+          newLines[currentLine2] = (newLines[currentLine2] || '') + currentLine[charIndex];
+          return newLines;
+        });
+        charIndex++;
+      } else {
+        clearInterval(typeInterval);
+        setCurrentLine2(prev => prev + 1);
+      }
+    }, 50);
 
-      return () => clearInterval(typeInterval);
-    }
+    return () => clearInterval(typeInterval);
   }, [currentLine1, currentLine2]);
 
   return (
@@ -110,9 +118,9 @@ export default function App() {
       <div className="main-content">
         {/* Title Section with Runes Animation */}
         <div className="title-section">
-          {showRunes && (
+          {!showTitle && displayTitle && (
             <h1 className="runes-text animate-runes">
-              {runesText}
+              {displayTitle}
             </h1>
           )}
           {showTitle && (
@@ -130,7 +138,7 @@ export default function App() {
           <div className="poem-column poem-column-1">
             {poem1Lines.map((line, index) => (
               <p key={index} className={`poem-line ${index < currentLine1 ? 'visible' : ''}`}>
-                {typedPoem1.split('\n')[index] || ''}
+                {typedPoem1[index] || ''}
                 {index === currentLine1 - 1 && isTyping1 && <span className="cursor">|</span>}
               </p>
             ))}
@@ -140,7 +148,7 @@ export default function App() {
           <div className="poem-column poem-column-2">
             {poem2Lines.map((line, index) => (
               <p key={index} className={`poem-line ${index < currentLine2 ? 'visible' : ''}`}>
-                {typedPoem2.split('\n')[index] || ''}
+                {typedPoem2[index] || ''}
                 {index === currentLine2 - 1 && currentLine1 >= poem1Lines.length && <span className="cursor">|</span>}
               </p>
             ))}
@@ -170,6 +178,16 @@ export default function App() {
                   alt="LICUADO"
                   className="licuado-logo"
                 />
+              </div>
+              
+              {/* Seal - ABIERTO A NEGOCIAR */}
+              <div className="seal-section">
+                <div className="negotiable-seal">ABIERTO A NEGOCIAR</div>
+              </div>
+              
+              {/* Button Placeholder */}
+              <div className="button-placeholder">
+                {/* Button will be added here later */}
               </div>
               
               {/* Description Text */}
