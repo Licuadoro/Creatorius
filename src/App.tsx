@@ -11,14 +11,36 @@ export default function App() {
   const [isTyping1, setIsTyping1] = useState(false);
   const [isTyping2, setIsTyping2] = useState(false);
   
-  // Runas nórdicas antiguas (Futhark) que significan: "Creo tu proyecto con el detalle de un dios creando un mundo. ...¿Acaso no lo soy?"
-  // Usamos exactamente los mismos caracteres que el texto final para que la transformación sea perfecta
+  // Texto final exacto
   const titleText = "Háblame de tu idea,\ny será real\nantes de lo que esperas.";
   
   // Estado para la animación de transformación de runas a texto
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
   const [isTransforming, setIsTransforming] = useState(true);
   
+  // Runas nórdicas antiguas (Futhark) - mapeo carácter por carácter
+  // Usamos runas que fonéticamente se aproximan o son equivalentes simbólicos
+  const runesMap: Record<string, string> = {
+    'H': 'ᚺ', 'á': 'ᚨ', 'b': 'ᛒ', 'l': 'ᛚ', 'a': 'ᚨ', 'm': 'ᛗ', 'e': 'ᛖ', 
+    ' ': ' ', ',': ',', '\n': '\n',
+    'd': 'ᛞ', 't': 'ᛏ', 'u': 'ᚢ', 'i': 'ᛁ', 'y': 'ᚤ',
+    's': 'ᛋ', 'é': 'ᛖ', 'r': 'ᚱ', 'n': 'ᚾ',
+    'c': 'ᚲ', 'o': 'ᛟ', 'p': 'ᛈ', 'q': 'ᚲ', 'f': 'ᚠ',
+    'g': 'ᚷ', 'j': 'ᛃ', 'k': 'ᚲ', 'v': 'ᚹ', 'w': 'ᚹ',
+    'x': 'ᚲᛋ', 'z': 'ᛉ',
+    '¿': '᛫', '?': '᛫', '.': '.',
+    'A': 'ᚨ', 'B': 'ᛒ', 'C': 'ᚲ', 'D': 'ᛞ', 'E': 'ᛖ', 'F': 'ᚠ',
+    'G': 'ᚷ', 'I': 'ᛁ', 'J': 'ᛃ', 'K': 'ᚲ', 'L': 'ᛚ', 'M': 'ᛗ',
+    'N': 'ᚾ', 'O': 'ᛟ', 'P': 'ᛈ', 'Q': 'ᚲ', 'R': 'ᚱ', 'S': 'ᛋ',
+    'T': 'ᛏ', 'U': 'ᚢ', 'V': 'ᚹ', 'W': 'ᚹ', 'X': 'ᚲᛋ', 'Y': 'ᚤ', 'Z': 'ᛉ'
+  };
+  
+  // Generar texto de runas basado en el texto final - misma longitud exacta
+  const runesText = titleText.split('').map(char => runesMap[char] || char).join('');
+  
+  // Array pre-calculado con los caracteres finales para asegurar que todas las runas se transformen completamente
+  const finalChars = titleText.split('');
+
   const poem1Lines = [
     "Describe tu proyecto,",
     "y yo lo construyo sin pretextos,",
@@ -36,14 +58,6 @@ export default function App() {
     "que germina como un azafrán entre el asfalto,",
     "como tu idea entre mis manos y el teclado"
   ];
-
-  // Mapeo de runas a letras del texto final - misma longitud exacta, carácter por carácter
-  // Cada runa corresponde exactamente a cada carácter del texto final incluyendo tildes y espacios
-  // Las runas se transforman en las letras correspondientes manteniendo la posición exacta
-  const runesText = "ᚺᚠᛒᛚᚠᛗᛖ ᛞᛖ ᛏᚢ ᛁᛞᛖᚠ,\nᚤ ᛋᛖᚱᚠ ᚱᛖᚠᛚ\nᚠᚾᛏᛖᛋ ᛞᛖ ᛚᛟ ᚲᚢᛖ ᛖᛋᛈᛖᚱᚠᛋ.";
-  
-  // Array pre-calculado con los caracteres finales para asegurar que todas las runas se transformen completamente
-  const finalChars = titleText.split('');
 
   // Animación de transformación de runas a texto - letra por letra en la misma posición
   useEffect(() => {
