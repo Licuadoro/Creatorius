@@ -32,6 +32,15 @@ __pycache__/
 coverage/
 htmlcov/
 .coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
+.DS_Store
+*.sublime-workspace
 
 # OS generated files
 .DS_Store

@@ -55,7 +55,7 @@ export default function App() {
         clearInterval(transformInterval);
         setIsTransforming(false);
       }
-    }, 80);
+    }, 100);
 
     return () => clearInterval(transformInterval);
   }, []);
