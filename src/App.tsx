@@ -11,9 +11,13 @@ export default function App() {
   const [isTyping1, setIsTyping1] = useState(false);
   const [isTyping2, setIsTyping2] = useState(false);
   
-  // Runas nórdicas antiguas que significan: "Creo tu idea con la delicadeza de un dios creando un mundo. ¿Acaso no lo soy?"
-  const runesText = "ᚠᚱᛖᚷᚾᚨ ᛁᚦᛖᚨ ᚹᛁᚦ ᚦᛖ ᚦᛖᚾᛖᚱᚾᛖᛋᛋ ᚨᚢ ᚨ ᚷᛟᛞ ᚲᚱᛖᚨᛏᛁᚾᚷ ᚨ ᚹᛟᚱᛚᛞ ᛫ ᛁᛋ ᚦᚨᛏ ᚾᛟᛏ ᚹᚺᚨᛏ ᛁ ᚨᛗ?";
-  const titleText = "Háblame de tu idea,\ny será real\nantes de lo que esperas";
+  // Runas nórdicas antiguas (Futhark) que significan: "Creo tu proyecto con el detalle de un dios creando un mundo. ...¿Acaso no lo soy?"
+  const runesText = "ᚲᚱᛖᛟ ᛏᚢ ᛈᚱᛟᚤᛖᚲᛏᛟ ᚲᛟᚾ ᛖᛚ ᛞᛖᛏᚨᛚᛚᛖ ᛞᛖ ᚢᚾ ᛞᛁᛟᛋ ᚲᚱᛖᚨᚾᛞᛟ ᚢᚾ ᛗᚢᚾᛞᛟ ᛫ ᛫ ᛫ ¿ᚨᚲᚨᛋᛟ ᚾᛟ ᛚᛟ ᛋᛟᚤ?";
+  const titleText = "Háblame de tu idea,\ny será real\nantes de lo que esperas.";
+  
+  // Estado para la animación de transformación de runas a texto
+  const [transformedChars, setTransformedChars] = useState<string[]>([]);
+  const [isTransforming, setIsTransforming] = useState(true);
   
   const poem1Lines = [
     "Describe tu proyecto,",
@@ -33,29 +37,32 @@ export default function App() {
     "como tu idea entre mis manos y el teclado"
   ];
 
-  // Animación de runas a título - conversión carácter por carácter
+  // Animación de transformación de runas a texto - letra por letra en la misma posición
   useEffect(() => {
-    let runeIndex = 0;
-    const titleChars = titleText.split('');
+    const runesArray = runesText.split('');
+    const titleArray = titleText.split('');
+    let currentIndex = 0;
     
-    const convertInterval = setInterval(() => {
-      if (runeIndex < titleChars.length) {
-        setDisplayTitle(prev => prev + titleChars[runeIndex]);
-        runeIndex++;
+    const transformInterval = setInterval(() => {
+      if (currentIndex < Math.min(runesArray.length, titleArray.length)) {
+        setTransformedChars(prev => {
+          const newChars = [...prev];
+          newChars[currentIndex] = titleArray[currentIndex];
+          return newChars;
+        });
+        currentIndex++;
       } else {
-        clearInterval(convertInterval);
-        setTimeout(() => {
-          setShowTitle(true);
-        }, 500);
+        clearInterval(transformInterval);
+        setIsTransforming(false);
       }
     }, 80);
 
-    return () => clearInterval(convertInterval);
+    return () => clearInterval(transformInterval);
   }, []);
 
-  // Animación de escritura del poema 1
+  // Animación de escritura del poema 1 - se activa después de la transformación
   useEffect(() => {
-    if (!showTitle || currentLine1 >= poem1Lines.length || isTyping1) return;
+    if (isTransforming || currentLine1 >= poem1Lines.length || isTyping1) return;
     
     setIsTyping1(true);
     let charIndex = 0;
@@ -77,7 +84,7 @@ export default function App() {
     }, 50);
 
     return () => clearInterval(typeInterval);
-  }, [showTitle, currentLine1]);
+  }, [isTransforming, currentLine1]);
 
   // Animación de escritura del poema 2
   useEffect(() => {
@@ -106,11 +113,6 @@ export default function App() {
 
   return (
     <div className="creatorius-container">
-      {/* Import Google Fonts */}
-      <style>
-        {`@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=VT323&family=Eater&display=swap');`}
-      </style>
-
       {/* Animated Background Pattern */}
       <div className="background-pattern"></div>
 
@@ -118,18 +120,17 @@ export default function App() {
       <div className="main-content">
         {/* Title Section with Runes Animation */}
         <div className="title-section">
-          {!showTitle && displayTitle && (
-            <h1 className="runes-text animate-runes">
-              {displayTitle}
-            </h1>
-          )}
-          {showTitle && (
-            <h1 className="main-title animate-fade-in">
-              Háblame de tu idea,<br />
-              y será real<br />
-              antes de lo que esperas
-            </h1>
-          )}
+          <h1 className="runes-text animate-runes">
+            {runesText.split('').map((rune, index) => (
+              <span 
+                key={index} 
+                className={`rune-char ${transformedChars[index] ? 'transformed' : ''}`}
+                style={{ transitionDelay: `${index * 80}ms` }}
+              >
+                {transformedChars[index] || rune}
+              </span>
+            ))}
+          </h1>
         </div>
 
         {/* Poem Section - Two Columns */}
