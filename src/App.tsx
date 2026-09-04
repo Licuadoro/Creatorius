@@ -12,12 +12,15 @@ export default function App() {
   const [isTyping2, setIsTyping2] = useState(false);
   
   // Runas nórdicas antiguas (Futhark) que significan: "Creo tu proyecto con el detalle de un dios creando un mundo. ...¿Acaso no lo soy?"
-  const runesText = "ᚲᚱᛖᛟ ᛏᚢ ᛈᚱᛟᚤᛖᚲᛏᛟ ᚲᛟᚾ ᛖᛚ ᛞᛖᛏᚨᛚᛚᛖ ᛞᛖ ᚢᚾ ᛞᛁᛟᛋ ᚲᚱᛖᚨᚾᛞᛟ ᚢᚾ ᛗᚢᚾᛞᛟ ᛫ ᛫ ᛫ ¿ᚨᚲᚨᛋᛟ ᚾᛟ ᛚᛟ ᛋᛟᚤ?";
+  // Usamos exactamente los mismos caracteres que el texto final para que la transformación sea perfecta
   const titleText = "Háblame de tu idea,\ny será real\nantes de lo que esperas.";
   
   // Estado para la animación de transformación de runas a texto
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
   const [isTransforming, setIsTransforming] = useState(true);
+  
+  // Mapeo de runas a letras del texto final - misma longitud exacta
+  const runesText = "ᚺᚨᛒᛚᚨᛗᛖ ᛞᛖ ᛏᚢ ᛁᛞᛖᚨ,\nᚤ ᛋᛖᚱᚨ ᚱᛖᚨᛚ\nᚨᚾᛏᛖᛋ ᛞᛖ ᛚᛟ ᚲᚢᛖ ᛖᛋᛈᛖᚱᚨᛋ.";
   
   const poem1Lines = [
     "Describe tu proyecto,",
