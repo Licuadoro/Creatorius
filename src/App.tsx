@@ -19,9 +19,6 @@ export default function App() {
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
   const [isTransforming, setIsTransforming] = useState(true);
   
-  // Mapeo de runas a letras del texto final - misma longitud exacta
-  const runesText = "ᚺᚨᛒᛚᚨᛗᛖ ᛞᛖ ᛏᚢ ᛁᛞᛖᚨ,\nᚤ ᛋᛖᚱᚨ ᚱᛖᚨᛚ\nᚨᚾᛏᛖᛋ ᛞᛖ ᛚᛟ ᚲᚢᛖ ᛖᛋᛈᛖᚱᚨᛋ.";
-  
   const poem1Lines = [
     "Describe tu proyecto,",
     "y yo lo construyo sin pretextos,",
@@ -40,14 +37,21 @@ export default function App() {
     "como tu idea entre mis manos y el teclado"
   ];
 
+  // Mapeo de runas a letras del texto final - misma longitud exacta, carácter por carácter
+  // Cada runa corresponde exactamente a cada carácter del texto final incluyendo tildes y espacios
+  // Las runas se transforman en las letras correspondientes manteniendo la posición exacta
+  const runesText = "ᚺᚠᛒᛚᚠᛗᛖ ᛞᛖ ᛏᚢ ᛁᛞᛖᚠ,\nᚤ ᛋᛖᚱᚠ ᚱᛖᚠᛚ\nᚠᚾᛏᛖᛋ ᛞᛖ ᛚᛟ ᚲᚢᛖ ᛖᛋᛈᛖᚱᚠᛋ.";
+  
+  // Array pre-calculado con los caracteres finales para asegurar que todas las runas se transformen completamente
+  const finalChars = titleText.split('');
+
   // Animación de transformación de runas a texto - letra por letra en la misma posición
   useEffect(() => {
-    const runesArray = runesText.split('');
-    const titleArray = titleText.split('');
+    const titleArray = finalChars;
     let currentIndex = 0;
     
     const transformInterval = setInterval(() => {
-      if (currentIndex < Math.min(runesArray.length, titleArray.length)) {
+      if (currentIndex < titleArray.length) {
         setTransformedChars(prev => {
           const newChars = [...prev];
           newChars[currentIndex] = titleArray[currentIndex];
@@ -57,8 +61,10 @@ export default function App() {
       } else {
         clearInterval(transformInterval);
         setIsTransforming(false);
+        // Asegurar que todos los caracteres estén completamente transformados
+        setTransformedChars(titleArray);
       }
-    }, 100);
+    }, 80);
 
     return () => clearInterval(transformInterval);
   }, []);
@@ -130,7 +136,7 @@ export default function App() {
                 className={`rune-char ${transformedChars[index] ? 'transformed' : ''}`}
                 style={{ transitionDelay: `${index * 80}ms` }}
               >
-                {transformedChars[index] || rune}
+                {transformedChars[index] !== undefined ? transformedChars[index] : rune}
               </span>
             ))}
           </h1>
