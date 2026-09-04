@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-/* Creatorius - Estilos con colores #e6ed21 y #ed7621 */
-
-/* Import Google Fonts */
+/* Import Google Fonts - debe estar antes de cualquier regla */
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=VT323&family=Eater&display=swap');
+
+/* Creatorius - Estilos con colores #e6ed21 y #ed7621 */
 
 /* Variables de color - Nuevo esquema amarillo/naranja */
 :root {
@@ -115,7 +115,37 @@ body {
   color: var(--primary-color);
   text-shadow: 0 0 20px var(--glow-color);
   letter-spacing: 0.3em;
-  animation: runesGlow 2s ease-in-out infinite alternate;
+  display: inline-block;
+}
+
+.rune-char {
+  display: inline-block;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.rune-char.transformed {
+  animation: runeTransform 0.5s ease-out forwards;
+  color: var(--text-primary);
+  text-shadow: 0 0 30px var(--primary-color);
+}
+
+@keyframes runeTransform {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
 }
 
 @keyframes runesGlow {
@@ -130,16 +160,7 @@ body {
 }
 
 .animate-runes {
-  animation: runesFadeOut 1s ease-out forwards;
-  animation-delay: 2s;
-}
-
-@keyframes runesFadeOut {
-  to {
-    opacity: 0;
-    transform: scale(0.9);
-    filter: blur(10px);
-  }
+  animation: runesGlow 2s ease-in-out infinite alternate;
 }
 
 .main-title {
@@ -195,6 +216,22 @@ body {
 .poem-line.visible {
   opacity: 1;
   transform: translateX(0);
+}
+
+/* Animación de escritura manual para el poema */
+@keyframes handwritingWrite {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.poem-line.typing {
+  animation: handwritingWrite 0.5s ease-out forwards;
+  border-right: 2px solid var(--accent-color);
+  padding-right: 2px;
 }
 
 .cursor {
