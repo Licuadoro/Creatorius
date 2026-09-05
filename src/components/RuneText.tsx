@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import RuneGlyph from "./RuneGlyph";
-import { ANCIENT_MEANING, HEADLINE_LINES } from "../data";
+import { HEADLINE_LINES } from "../data";
 import { useReducedMotion } from "../hooks";
 
 type Cell = { ch: string; g: number; endOfLine: boolean };
@@ -126,22 +126,7 @@ export default function RuneText() {
         ))}
       </div>
 
-      {/* inscripción original: la traducción de las runas */}
-      <div
-        className={`fade-up mt-7 max-w-xl border-l-2 pl-4 transition-all ${
-          done ? "on border-gold-500/60" : "border-transparent"
-        }`}
-        aria-hidden={!done}
-      >
-        <p className="font-digital text-[11px] tracking-[0.22em] text-gold-500/90">
-          INSCRIPCIÓN ORIGINAL · TRADUCCIÓN
-        </p>
-        <p className="mt-1.5 text-sm italic leading-relaxed text-parch-300/85">
-          «{ANCIENT_MEANING}»
-        </p>
-      </div>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="mt-8 flex flex-wrap items-center gap-3">
         <button
           onClick={replay}
           className={`group inline-flex items-center gap-2 border border-gold-600/40 px-3.5 py-2 font-digital text-[11px] tracking-[0.18em] text-gold-300 transition-all duration-300 hover:border-gold-400 hover:bg-gold-400/10 hover:shadow-[0_0_24px_rgba(227,179,65,0.18)] ${

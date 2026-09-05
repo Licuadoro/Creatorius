@@ -11,6 +11,7 @@
   --color-parch-100: #f2e9d5;
   --color-parch-300: #d9cba9;
   --color-parch-500: #a8987a;
+  --color-parch-600: #8a7c62;
   --color-parch-700: #6f6450;
 
   --color-gold-200: #f6dfa0;
@@ -235,6 +236,91 @@ details.oracle > summary::-webkit-details-marker { display: none; }
 details.oracle .oracle-icon { transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.3, 1); }
 details.oracle[open] .oracle-icon { transform: rotate(135deg); }
 details.oracle[open] .oracle-q { color: var(--color-gold-300); }
+
+/* ---------- tarjetas de ofrendas ---------- */
+.price-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-ink-600);
+  background: linear-gradient(160deg, rgba(23, 30, 44, 0.92), rgba(14, 20, 29, 0.96));
+  padding: 1.55rem;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s ease,
+    box-shadow 0.5s ease;
+}
+.price-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(227, 179, 65, 0.11) 47%,
+    rgba(94, 234, 212, 0.07) 53%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.price-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(227, 179, 65, 0.55);
+  box-shadow:
+    0 26px 60px -26px rgba(0, 0, 0, 0.75),
+    0 0 36px -10px rgba(227, 179, 65, 0.3);
+}
+.price-card:hover::after { transform: translateX(130%); }
+
+.price-card .pc-corner {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-color: var(--color-gold-500);
+  opacity: 0.4;
+  transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.pc-tl { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; }
+.pc-tr { top: 6px; right: 6px; border-top: 2px solid; border-right: 2px solid; }
+.pc-bl { bottom: 6px; left: 6px; border-bottom: 2px solid; border-left: 2px solid; }
+.pc-br { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; }
+.price-card:hover .pc-corner { width: 22px; height: 22px; opacity: 1; border-color: var(--color-gold-400); }
+
+.price-card .pc-sigil {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.4s ease;
+}
+.price-card:hover .pc-sigil { transform: rotate(10deg) scale(1.14); color: var(--color-gold-300); }
+
+.price-card .pc-price { transition: color 0.4s ease, letter-spacing 0.5s ease, text-shadow 0.5s ease; }
+.price-card:hover .pc-price {
+  color: var(--color-gold-300);
+  letter-spacing: 0.045em;
+  text-shadow: 0 0 22px rgba(227, 179, 65, 0.35);
+}
+
+.price-card-ambos { border-style: dashed; border-color: rgba(94, 234, 212, 0.35); }
+.price-card-ambos:hover { border-color: rgba(94, 234, 212, 0.7); box-shadow: 0 26px 60px -26px rgba(0,0,0,0.75), 0 0 36px -10px rgba(94, 234, 212, 0.32); }
+.price-card-ambos .pc-corner { border-color: var(--color-mint-500); }
+.price-card-ambos:hover .pc-corner { border-color: var(--color-mint-400); }
+
+.price-card-corp { border-color: rgba(227, 179, 65, 0.35); background: linear-gradient(160deg, rgba(34, 33, 26, 0.9), rgba(14, 20, 29, 0.96)); }
+
+/* ---------- calculadora ---------- */
+@keyframes count-pop {
+  0% { transform: scale(1.28); filter: brightness(1.6); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.count-pop { display: inline-block; animation: count-pop 0.35s cubic-bezier(0.2, 0.8, 0.3, 1); }
+
+@keyframes banner-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(94, 234, 212, 0); }
+  50% { box-shadow: 0 0 28px -6px rgba(94, 234, 212, 0.5); }
+}
+.ambos-on { animation: banner-glow 2.6s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
