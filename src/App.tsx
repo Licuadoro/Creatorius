@@ -9,8 +9,8 @@ export default function App() {
   const [isTyping1, setIsTyping1] = useState(false);
   const [isTyping2, setIsTyping2] = useState(false);
   
-  // Texto final exacto - este es el texto al que se transformarán las runas
-  const finalText = "Háblame de tu idea,\ny será real antes de lo que esperas.";
+  // Texto final exacto dividido en varias líneas - este es el texto al que se transformarán las runas
+  const finalText = "Háblame de tu idea,\ny será real\nantes de lo que esperas.";
   
   // Estado para la animación de transformación de runas a texto
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
@@ -21,7 +21,9 @@ export default function App() {
   const runeMapping: string[] = [
     'ᚺ', 'ᚨ', 'ᛒ', 'ᛚ', 'ᚨ', 'ᛗ', 'ᛖ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛏ', 'ᚢ', ' ', 'ᛁ', 'ᛞ', 'ᛖ', 'ᚨ', ',',
     '\n',
-    'ᚤ', ' ', 'ᛋ', 'ᛖ', 'ᚱ', 'ᚨ', ' ', 'ᚱ', 'ᛖ', 'ᚨ', 'ᛚ', ' ', 'ᚨ', 'ᚾ', 'ᛏ', 'ᛖ', 'ᛋ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛚ', 'ᛟ', ' ', 'ᚲ', 'ᚢ', 'ᛖ', ' ', 'ᛖ', 'ᛋ', 'ᛈ', 'ᛖ', 'ᚱ', 'ᚨ', 'ᛋ', '.'
+    'ᚤ', ' ', 'ᛋ', 'ᛖ', 'ᚱ', 'ᚨ', ' ', 'ᚱ', 'ᛖ', 'ᚨ', 'ᛚ',
+    '\n',
+    'ᚨ', 'ᚾ', 'ᛏ', 'ᛖ', 'ᛋ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛚ', 'ᛟ', ' ', 'ᚲ', 'ᚢ', 'ᛖ', ' ', 'ᛖ', 'ᛋ', 'ᛈ', 'ᛖ', 'ᚱ', 'ᚨ', 'ᛋ', '.'
   ];
   
   // Array pre-calculado con los caracteres finales
@@ -125,87 +127,93 @@ export default function App() {
       {/* Animated Background Pattern */}
       <div className="background-pattern"></div>
 
-      {/* Main Content */}
-      <div className="main-content">
-        {/* Title Section with Runes Animation */}
-        <div className="title-section">
-          <h1 className="runes-text animate-runes">
-            {runeMapping.map((rune, index) => (
-              <span 
-                key={index} 
-                className={`rune-char ${transformedChars[index] ? 'transformed' : ''}`}
-                style={{ transitionDelay: `${index * 80}ms` }}
-              >
-                {transformedChars[index] !== undefined ? transformedChars[index] : rune}
-              </span>
-            ))}
-          </h1>
-        </div>
-
-        {/* Poem Section - Two Columns */}
-        <div className="poem-container">
-          {/* First Stanza */}
-          <div className="poem-column poem-column-1">
-            {poem1Lines.map((line, index) => (
-              <p key={index} className={`poem-line ${index < currentLine1 ? 'visible' : ''}`}>
-                {typedPoem1[index] || ''}
-                {index === currentLine1 && isTyping1 && <span className="cursor">|</span>}
-              </p>
-            ))}
+      {/* Main Content - Two Column Layout */}
+      <div className="main-content-grid">
+        {/* Left Column: Title and Poem */}
+        <div className="left-column">
+          {/* Title Section with Runes Animation */}
+          <div className="title-section">
+            <h1 className="runes-text animate-runes">
+              {runeMapping.map((rune, index) => (
+                <span 
+                  key={index} 
+                  className={`rune-char ${transformedChars[index] ? 'transformed' : ''}`}
+                  style={{ transitionDelay: `${index * 80}ms` }}
+                >
+                  {transformedChars[index] !== undefined ? transformedChars[index] : rune}
+                </span>
+              ))}
+            </h1>
           </div>
 
-          {/* Second Stanza */}
-          <div className="poem-column poem-column-2">
-            {poem2Lines.map((line, index) => (
-              <p key={index} className={`poem-line ${index < currentLine2 ? 'visible' : ''}`}>
-                {typedPoem2[index] || ''}
-                {index === currentLine2 && currentLine1 >= poem1Lines.length && isTyping2 && <span className="cursor">|</span>}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* ID Card */}
-        <div className="card-container">
-          <a href="https://licuado.netlify.app" target="_blank" rel="noopener noreferrer" className="id-card-link">
-            <div className="id-card">
-              <div className="card-header">
-                <img 
-                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbwhRnXPvUxggOGE4t5RFCC0CLWuAj7shFk4dxvgB0PHMjSg5dw-lVElDkyEGh0gN6PiFT_uDTPxnYS-j9gJcmmlmBR8FM9ohUgXRA4gHWcPNejaHUk9W3LW440ZMsBOFVS2LBsIpms5YmdnPIEUpG0YI8-EsoKxyay7XrckorCDjCbztBfDW0o3eHAss/s1600/1000068010.png" 
-                  alt="Licuadoro"
-                  className="profile-photo"
-                />
-                <div className="name-section">
-                  <h2 className="card-name">Licuadoro</h2>
-                  <p className="card-desde">desde</p>
-                </div>
-              </div>
-              
-              {/* LICUADO Logo - Full Width */}
-              <div className="logo-section">
-                <img 
-                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEig4A61ubaXudlMBf9SCPqveobOArRzeOSa6fRRhyphenhyphenC5XGYQ5hrRTpgGwaHqF1v6BjcV1SgqI4llf1S_Q5cODBbVJfAHlURs1FQpQPRkrU8RypzgS6K6FYtFFBnuDsMYHyyrFS9oMAQMGxhWrCxkSXY55QcUuvsEnsQ5BIj-YY4pxMm6bboNtuGZNgaoa9M/s1600/1000068819.png" 
-                  alt="LICUADO"
-                  className="licuado-logo"
-                />
-              </div>
-              
-              {/* Seal - ABIERTO A NEGOCIAR */}
-              <div className="seal-section">
-                <div className="negotiable-seal">ABIERTO A NEGOCIAR</div>
-              </div>
-              
-              {/* Button Placeholder */}
-              <div className="button-placeholder">
-                {/* Button will be added here later */}
-              </div>
-              
-              {/* Description Text */}
-              <p className="card-description">
-                Soy por ahora, el único miembro de LICUADO, un estudio de videojuegos con más ambición que personal, y esa frase es literal. La cosa es que necesito fondos para hacer despegar este proyecto, ya que mi cuenta bancaria en este momento en que escribo esto está literalmente en 0. Pero no pienso esperar, ni dejar que esta llama se apague, así que por eso te ofrezco este servicio, en el que por dinero te hago una web como tu la quieras, con alta calidad y todo eso.
-              </p>
+          {/* Poem Section - Two Columns */}
+          <div className="poem-container">
+            {/* First Stanza */}
+            <div className="poem-column poem-column-1">
+              {poem1Lines.map((line, index) => (
+                <p key={index} className={`poem-line ${index < currentLine1 ? 'visible' : ''}`}>
+                  {typedPoem1[index] || ''}
+                  {index === currentLine1 && isTyping1 && <span className="cursor">|</span>}
+                </p>
+              ))}
             </div>
-          </a>
+
+            {/* Second Stanza */}
+            <div className="poem-column poem-column-2">
+              {poem2Lines.map((line, index) => (
+                <p key={index} className={`poem-line ${index < currentLine2 ? 'visible' : ''}`}>
+                  {typedPoem2[index] || ''}
+                  {index === currentLine2 && currentLine1 >= poem1Lines.length && isTyping2 && <span className="cursor">|</span>}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Right Column: ID Card */}
+        <div className="right-column">
+          {/* ID Card */}
+          <div className="card-container">
+            <a href="https://licuado.netlify.app" target="_blank" rel="noopener noreferrer" className="id-card-link">
+              <div className="id-card">
+                <div className="card-header">
+                  <img 
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbwhRnXPvUxggOGE4t5RFCC0CLWuAj7shFk4dxvgB0PHMjSg5dw-lVElDkyEGh0gN6PiFT_uDTPxnYS-j9gJcmmlmBR8FM9ohUgXRA4gHWcPNejaHUk9W3LW440ZMsBOFVS2LBsIpms5YmdnPIEUpG0YI8-EsoKxyay7XrckorCDjCbztBfDW0o3eHAss/s1600/1000068010.png" 
+                    alt="Licuadoro"
+                    className="profile-photo"
+                  />
+                  <div className="name-section">
+                    <h2 className="card-name">Licuadoro</h2>
+                    <p className="card-desde">desde</p>
+                  </div>
+                </div>
+                
+                {/* LICUADO Logo - Full Width */}
+                <div className="logo-section">
+                  <img 
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEig4A61ubaXudlMBf9SCPqveobOArRzeOSa6fRRhyphenhyphenC5XGYQ5hrRTpgGwaHqF1v6BjcV1SgqI4llf1S_Q5cODBbVJfAHlURs1FQpQPRkrU8RypzgS6K6FYtFFBnuDsMYHyyrFS9oMAQMGxhWrCxkSXY55QcUuvsEnsQ5BIj-YY4pxMm6bboNtuGZNgaoa9M/s1600/1000068819.png" 
+                    alt="LICUADO"
+                    className="licuado-logo"
+                  />
+                </div>
+                
+                {/* Seal - ABIERTO A NEGOCIAR */}
+                <div className="seal-section">
+                  <div className="negotiable-seal">ABIERTO A NEGOCIAR</div>
+                </div>
+                
+                {/* Button Placeholder */}
+                <div className="button-placeholder">
+                  {/* Button will be added here later */}
+                </div>
+                
+                {/* Description Text */}
+                <p className="card-description">
+                  Soy por ahora, el único miembro de LICUADO, un estudio de videojuegos con más ambición que personal, y esa frase es literal. La cosa es que necesito fondos para hacer despegar este proyecto, ya que mi cuenta bancaria en este momento en que escribo esto está literalmente en 0. Pero no pienso esperar, ni dejar que esta llama se apague, así que por eso te ofrezco este servicio, en el que por dinero te hago una web como tu la quieras, con alta calidad y todo eso.
+                </p>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>

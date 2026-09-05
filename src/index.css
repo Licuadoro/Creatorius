@@ -89,6 +89,31 @@ body {
   position: relative;
 }
 
+.main-content-grid {
+  width: 100%;
+  max-width: 1600px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  padding: 2rem;
+  align-items: start;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+.right-column {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 2rem;
+}
+
 .main-content {
   width: 100%;
   max-width: 1400px;
@@ -100,19 +125,19 @@ body {
 
 /* Sección del título con runas */
 .title-section {
-  text-align: center;
-  min-height: 400px;
+  text-align: left;
+  min-height: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
-  padding-top: 2rem;
+  padding-top: 0;
 }
 
 .runes-text {
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  font-size: 5.5rem;
+  font-size: 4.5rem;
   color: var(--primary-color);
   text-shadow: 0 0 20px var(--glow-color);
   letter-spacing: 0.05em;
@@ -120,7 +145,7 @@ body {
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.3;
-  max-width: 1400px;
+  max-width: 100%;
 }
 
 .rune-char {
