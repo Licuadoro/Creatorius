@@ -356,3 +356,24 @@ export const PORTAFOLIO: Obra[] = [
     tono: "ember",
   },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Ilustraciones de la casa                                            */
+/* ------------------------------------------------------------------ */
+
+export type Ilustracion = { src: string; titulo: string };
+
+export const ILUSTRACIONES: Ilustracion[] = [
+  {
+    src: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgq8xIVIeLa27j0NOcCwHdrSuB4m-Exed2ZdKwvyxWfndYiOPk5L_0_4wnPERG69GNvXfPTomYeUExKsO4ENHIywdjdxw-4GbMPwlssVLzdjvWDISJLc4p_F3GmTo-o9CQGJQ5rQD4UoYoBF4tQQhC-qkwhssg1PwrxDKoZElB_2Ux6188txkWphUe45VA/s1600/EPSON002.JPG",
+    titulo: "Tinta y trazo · lámina I",
+  },
+  {
+    src: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVEkN5pcGWKN2bCONVfqykht_E2uKyD9ldv6nOLErbFNVjDEoUpRW4ew9rOY9IiNer8BDfXqb9FZzJczjPCVRoYh8w4XI6ZbmRqRGtXvP7Xds9Cp5s0af98aezkLw-2HXFjPVaaPFUZdFY_eQxCy1nntPSsYxjcl9uQhmaw_KZ7MZ0rUsFQN5hKeJKlR8/s1600/si.png",
+    titulo: "Tinta y trazo · lámina II",
+  },
+  {
+    src: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi3I7qjXeBTziyGW7c_4YjHbvlTQvt6_DqST71l3LTYImjxfi7LkKb_f9bTI0DJ_T7aRC2ld39X5L2GL-oIcGj9d7eLvsEgOequ5mqlfpfLCSpBxls9VfnViwBxByWHLF-rxu0wdJM81rO_d4dbpEsgdtMLSpZQ_5f8Vvgbr41taFywwZrLLFZ2-915FjA/s16000/L%C3%BAmen%20Ecos%20bajo%20la%20corteza%20+%20logotipo%20de%20LICUADO.png",
+    titulo: "Lúmen Ecos bajo la corteza",
+  },
+];
