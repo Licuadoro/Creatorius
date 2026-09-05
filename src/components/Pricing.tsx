@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Reveal, SectionHeading } from "./Chrome";
 import { LICUADO_URL, RECIBO_HASH } from "../data";
+import { Money, useCurrency } from "../currency";
 
 /* ============================================================
    PRECIOS
@@ -159,12 +160,23 @@ function Band({
   );
 }
 
-function Big({ amount, unit, note, accent = "text-gold-400" }: { amount: string; unit?: string; note?: string; accent?: string }) {
+function Big({
+  value,
+  plus,
+  unit,
+  note,
+  accent = "text-gold-400",
+}: {
+  value: number;
+  plus?: boolean;
+  unit?: string;
+  note?: ReactNode;
+  accent?: string;
+}) {
   return (
     <div>
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 lg:justify-end">
-        <span className={`pc-price font-digital text-[32px] leading-none ${accent}`}>{amount}</span>
-        <span className="font-digital text-[12px] tracking-[0.14em] text-parch-400">$ COP</span>
+        <Money v={value} sign={plus ? "plus" : undefined} className={`pc-price font-digital text-[32px] leading-none ${accent}`} />
         {unit && <span className="font-digital text-[12px] tracking-[0.14em] text-parch-500">{unit}</span>}
       </div>
       {note && <p className="mt-2 font-digital text-[11px] tracking-[0.14em] text-parch-500">{note}</p>}
@@ -189,7 +201,7 @@ export function Ofrendas() {
           sigil={<Sigil d={SIGILS.base} className="h-7 w-7" />}
           title="Web básica"
           desc="Una web simple de una sola página."
-          right={<Big amount="190.000" />}
+          right={<Big value={P.basica} />}
           delay={0}
         />
 
@@ -198,7 +210,7 @@ export function Ofrendas() {
           sigil={<Sigil d={SIGILS.quill} className="h-7 w-7" />}
           title="+ Redacción"
           desc="Se añaden textos llamativos y deliciosamente redactados por un escritor con experiencia. Si no se incluye, se usarán los textos que proporcione el cliente, o textos simples / generados por IA."
-          right={<Big amount="+20.000" unit="/párrafo" />}
+          right={<Big value={P.redaccion} plus unit="/párrafo" />}
           delay={70}
         />
 
@@ -215,17 +227,19 @@ export function Ofrendas() {
               Si no se incluye, se usará tu material o imágenes generadas por IA.
             </>
           }
-          right={<Big amount="+30.000" unit="/grande" note="DIBUJO PEQUEÑO +3000 $ COP" />}
+          right={
+            <Big
+              value={P.grande}
+              plus
+              unit="/grande"
+              note={
+                <>
+                  DIBUJO PEQUEÑO <Money v={P.dibujo} sign="plus" className="text-gold-400" />
+                </>
+              }
+            />
+          }
           delay={140}
-        />
-
-        {/* + Páginas adicionales (básica) */}
-        <Band
-          sigil={<Sigil d={SIGILS.pages} className="h-7 w-7" />}
-          title="+ Páginas adicionales"
-          desc="¡Puedes añadir una página a la web por solo 60.000 $ COP! Ojo: las páginas adicionales no entran en el descuento «¡Ambos!»."
-          right={<Big amount="+60.000" unit="/página" />}
-          delay={0}
         />
 
         {/* «¡Ambos!» */}
@@ -238,14 +252,16 @@ export function Ofrendas() {
         >
           <div className="mt-7 grid gap-4 sm:grid-cols-3">
             {[
-              { old: "20.000", neo: "17.000", unit: "/párrafo", off: "−14,29%" },
-              { old: "30.000", neo: "25.000", unit: "/grande", off: "−12,5%" },
-              { old: "3000", neo: "1500", unit: "/dibujo", off: "−50%" },
+              { old: P.redaccion, neo: P.redaccionD, unit: "/párrafo", off: "−14,29%" },
+              { old: P.grande, neo: P.grandeD, unit: "/grande", off: "−12,5%" },
+              { old: P.dibujo, neo: P.dibujoD, unit: "/dibujo", off: "−50%" },
             ].map((r) => (
               <div key={r.unit} className="border border-gold-500/25 bg-ink-900/70 p-5 transition-all duration-500 group-hover:border-gold-500/50">
-                <p className="font-digital text-[13px] text-parch-500 line-through decoration-red-400/70">{r.old} $ COP</p>
+                <p className="font-digital text-[13px] text-parch-500 line-through decoration-red-400/70">
+                  <Money v={r.old} />
+                </p>
                 <p className="mt-1.5 font-digital text-[26px] leading-none text-mint-400">
-                  {r.neo} <span className="text-[12px] text-parch-400">$ COP{r.unit}</span>
+                  <Money v={r.neo} /> <span className="text-[12px] text-parch-400">{r.unit}</span>
                 </p>
                 <span className="mt-3.5 inline-block border border-mint-500/40 bg-mint-500/10 px-2 py-1 font-digital text-[10px] tracking-[0.12em] text-mint-300">
                   {r.off}
@@ -261,8 +277,12 @@ export function Ofrendas() {
           title="Garantía de cambios · 1 año"
           tag="TRANQUILIDAD BARATA"
           tone="mint"
-          desc="Por +50.000 $ COP, durante los 12 meses tras la entrega los cambios y retoques van incluidos. Siempre va incluída una garantía gratis de 1 mes."
-          right={<Big amount="+50.000" accent="text-mint-400" />}
+          desc={
+            <>
+              Por <Money v={P.garantia} sign="plus" className="text-mint-300" />, durante los 12 meses tras la entrega los cambios y retoques van incluidos. Siempre va incluída una garantía gratis de 1 mes.
+            </>
+          }
+          right={<Big value={P.garantia} plus accent="text-mint-400" />}
           delay={0}
         />
 
@@ -272,13 +292,19 @@ export function Ofrendas() {
           sigil={<Sigil d={SIGILS.tower} className="h-7 w-7" />}
           title="¿Necesitas 5 páginas? Empieza por la corporativa"
           tag="SALE MÁS BARATA"
-          desc="La web corporativa incluye 5 páginas por 390.000 $ COP. Haz cuentas: básica + 4 páginas adicionales serían 430.000 $ COP — te ahorras 40.000 $ COP."
+          desc={
+            <>
+              La web corporativa incluye 5 páginas por <Money v={P.corp} className="text-gold-300" />. Haz cuentas: básica + 4 páginas adicionales serían{" "}
+              <Money v={P.basica + 4 * P.pagina} className="text-parch-100" /> — te ahorras{" "}
+              <Money v={P.basica + 4 * P.pagina - P.corp} sign="minus" className="text-mint-300" />.
+            </>
+          }
           right={
             <div className="flex flex-wrap items-end gap-x-7 gap-y-2 lg:justify-end lg:text-right">
-              <Big amount="390.000" />
+              <Big value={P.corp} />
               <div className="pb-1">
                 <p className="font-digital text-[10px] tracking-[0.14em] text-parch-500">AHORRO FRENTE A BÁSICA + 4 PÁGINAS</p>
-                <p className="mt-1 font-digital text-[20px] leading-none text-mint-400">−40.000 $ COP</p>
+                <Money v={P.basica + 4 * P.pagina - P.corp} sign="minus" className="mt-1 block font-digital text-[20px] leading-none text-mint-400" />
               </div>
             </div>
           }
@@ -292,7 +318,7 @@ export function Ofrendas() {
           tag="NO ENTRA EN EL DESCUENTO «¡AMBOS!»"
           tone="red"
           desc="¡Puedes añadir una página a la web por solo esto! Cada página extra mantiene el mismo mimo que la primera. Eso sí: las páginas van siempre a tarifa, sin descuento «¡Ambos!»."
-          right={<Big amount="+60.000" note="POR PÁGINA" />}
+          right={<Big value={P.pagina} plus note="POR PÁGINA" />}
           delay={0}
         />
       </div>
@@ -333,11 +359,11 @@ function Stepper({
         <p className="mt-0.5 font-digital text-[10px] tracking-[0.12em] text-parch-500">
           {active ? (
             <>
-              <span className="text-mint-400">{fmt(discountPrice!)} $ COP</span>{" "}
-              <span className="text-parch-500 line-through">{fmt(unitPrice)}</span> · «¡AMBOS!»
+              <Money v={discountPrice!} className="text-mint-400" />{" "}
+              <Money v={unitPrice} className="text-parch-500 line-through" /> · «¡AMBOS!»
             </>
           ) : (
-            <>{fmt(unitPrice)} $ COP</>
+            <Money v={unitPrice} />
           )}{" "}
           · {hint}
         </p>
@@ -373,6 +399,7 @@ type EnvioStatus = "idle" | "sending" | "sent" | "fallback";
 type Errores = { nombre?: string; email?: string; idea?: string };
 
 function Calculator() {
+  const { formatMoney } = useCurrency();
   const [base, setBase] = useState<"basica" | "corp">("basica");
   const [redaccion, setRedaccion] = useState(0);
   const [grande, setGrande] = useState(0);
@@ -397,13 +424,13 @@ function Calculator() {
   const paceData = PACES.find((p) => p.id === pace)!;
 
   const rows: { label: string; value: string; mint?: boolean }[] = [
-    { label: base === "basica" ? "Web básica" : "Web corporativa", value: fmt(calc.baseCost) },
+    { label: base === "basica" ? "Web básica" : "Web corporativa", value: formatMoney(calc.baseCost) },
   ];
-  if (redaccion > 0) rows.push({ label: `Redacción ×${redaccion}`, value: fmt(calc.rCost), mint: ambos });
-  if (grande > 0) rows.push({ label: `Ilustración grande ×${grande}`, value: fmt(calc.gCost), mint: ambos });
-  if (dibujo > 0) rows.push({ label: `Dibujo pequeño ×${dibujo}`, value: fmt(calc.dCost), mint: ambos });
-  if (paginas > 0) rows.push({ label: `Páginas adicionales ×${paginas}`, value: fmt(calc.pCost) });
-  if (garantia) rows.push({ label: "Garantía de cambios · 1 año", value: fmt(calc.gar) });
+  if (redaccion > 0) rows.push({ label: `Redacción ×${redaccion}`, value: formatMoney(calc.rCost), mint: ambos });
+  if (grande > 0) rows.push({ label: `Ilustración grande ×${grande}`, value: formatMoney(calc.gCost), mint: ambos });
+  if (dibujo > 0) rows.push({ label: `Dibujo pequeño ×${dibujo}`, value: formatMoney(calc.dCost), mint: ambos });
+  if (paginas > 0) rows.push({ label: `Páginas adicionales ×${paginas}`, value: formatMoney(calc.pCost) });
+  if (garantia) rows.push({ label: "Garantía de cambios · 1 año", value: formatMoney(calc.gar) });
 
   /* ---- el envío del pacto ---- */
 

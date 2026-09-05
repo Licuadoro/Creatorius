@@ -5,8 +5,10 @@ import LicuadoroCard from "./components/LicuadoroCard";
 import Poem from "./components/Poem";
 import { Process } from "./components/Sections";
 import { Ofrendas } from "./components/Pricing";
+import Portafolio from "./components/Portfolio";
 import Recibo from "./components/Recibo";
 import { RECIBO_HASH } from "./data";
+import { CurrencyProvider } from "./currency";
 import { useReducedMotion } from "./hooks";
 
 function ScrollHint() {
@@ -63,23 +65,28 @@ export default function App() {
   // La mesa de recibos es privada: solo existe tras la runa secreta del enlace.
   if (hash.startsWith(`#/${RECIBO_HASH}`)) {
     return (
-      <div className="relative min-h-screen overflow-x-clip bg-ink-900 text-parch-200 selection:bg-gold-400/30 selection:text-parch-100">
-        <Ambient />
-        <Recibo />
-      </div>
+      <CurrencyProvider>
+        <div className="relative min-h-screen overflow-x-clip bg-ink-900 text-parch-200 selection:bg-gold-400/30 selection:text-parch-100">
+          <Ambient />
+          <Recibo />
+        </div>
+      </CurrencyProvider>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-ink-900 text-parch-200 selection:bg-gold-400/30 selection:text-parch-100">
-      <Ambient />
-      <Header />
-      <main className="relative z-10">
-        <Hero />
-        <Marquee />
-        <Process />
-        <Ofrendas />
-      </main>
-    </div>
+    <CurrencyProvider>
+      <div className="relative min-h-screen overflow-x-clip bg-ink-900 text-parch-200 selection:bg-gold-400/30 selection:text-parch-100">
+        <Ambient />
+        <Header />
+        <main className="relative z-10">
+          <Hero />
+          <Marquee />
+          <Process />
+          <Portafolio />
+          <Ofrendas />
+        </main>
+      </div>
+    </CurrencyProvider>
   );
 }
