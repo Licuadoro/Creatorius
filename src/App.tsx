@@ -11,7 +11,7 @@ export default function App() {
   
   // Texto final exacto dividido en varias líneas - este es el texto al que se transformarán las runas
   // Dividido cuidadosamente para evitar cortes de palabras en cualquier pantalla
-  const finalText = "Háblame de tu idea,\ny será real\nantes de lo que\nesperas.";
+  const finalText = "¿Tienes una idea?\nHábla conmigo\ny será real antes\nde lo que esperas.";
   
   // Estado para la animación de transformación de runas a texto
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
@@ -20,13 +20,13 @@ export default function App() {
   // Mapeo EXACTO carácter por carácter del texto final a runas
   // Cada posición en initialRunes corresponde exactamente a la misma posición en finalText
   const runeMapping: string[] = [
-    'ᚺ', 'ᚨ', 'ᛒ', 'ᛚ', 'ᚨ', 'ᛗ', 'ᛖ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛏ', 'ᚢ', ' ', 'ᛁ', 'ᛞ', 'ᛖ', 'ᚨ', ',',
+    'ᚦ', 'ᛁ', 'ᛖ', 'ᚾ', 'ᛖᛋ', ' ', 'ᚢ', 'ᚾᚨ', ' ', 'ᛁ', 'ᛞ', 'ᛖᚨ', '?',
     '\n',
-    'ᚤ', ' ', 'ᛋ', 'ᛖ', 'ᚱ', 'ᚨ', ' ', 'ᚱ', 'ᛖ', 'ᚨ', 'ᛚ',
+    'ᚺ', 'ᚨ', 'ᛒ', 'ᛚᚨ', ' ', 'ᚲ', 'ᛟ', 'ᚾ', 'ᛗ', 'ᛁ', 'ᚷ', 'ᛟ',
     '\n',
-    'ᚨ', 'ᚾ', 'ᛏ', 'ᛖ', 'ᛋ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛚ', 'ᛟ', ' ', 'ᚲ', 'ᚢ', 'ᛖ',
+    'ᚤ', ' ', 'ᛋ', 'ᛖ', 'ᚱ', 'ᚨ', ' ', 'ᚱ', 'ᛖᚨ', 'ᛚ', ' ', 'ᚨ', 'ᚾ', 'ᛏ', 'ᛖᛋ',
     '\n',
-    'ᛖ', 'ᛋ', 'ᛈ', 'ᛖ', 'ᚱ', 'ᚨ', 'ᛋ', '.'
+    'ᛞ', 'ᛖ', ' ', 'ᛚ', 'ᛟ', ' ', 'ᚦ', 'ᚢ', 'ᛖ', ' ', 'ᛖᛋᛈ', 'ᛖ', 'ᚱ', 'ᚨᛋ', '.'
   ];
   
   // Array pre-calculado con los caracteres finales
