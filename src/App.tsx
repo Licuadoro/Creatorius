@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import './index.css';
 
 export default function App() {
-  const [displayTitle, setDisplayTitle] = useState('');
-  const [showTitle, setShowTitle] = useState(false);
   const [typedPoem1, setTypedPoem1] = useState<string[]>([]);
   const [typedPoem2, setTypedPoem2] = useState<string[]>([]);
   const [currentLine1, setCurrentLine1] = useState(0);
@@ -11,35 +9,25 @@ export default function App() {
   const [isTyping1, setIsTyping1] = useState(false);
   const [isTyping2, setIsTyping2] = useState(false);
   
-  // Texto final exacto
-  const titleText = "Háblame de tu idea,\ny será real\nantes de lo que esperas.";
+  // Texto final exacto - este es el texto al que se transformarán las runas
+  const finalText = "Háblame de tu idea,\ny será real\nantes de lo que esperas.";
   
   // Estado para la animación de transformación de runas a texto
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
   const [isTransforming, setIsTransforming] = useState(true);
   
-  // Runas nórdicas antiguas (Futhark) - mapeo carácter por carácter
-  // Usamos runas que fonéticamente se aproximan o son equivalentes simbólicos
-  const runesMap: Record<string, string> = {
-    'H': 'ᚺ', 'á': 'ᚨ', 'b': 'ᛒ', 'l': 'ᛚ', 'a': 'ᚨ', 'm': 'ᛗ', 'e': 'ᛖ', 
-    ' ': ' ', ',': ',', '\n': '\n',
-    'd': 'ᛞ', 't': 'ᛏ', 'u': 'ᚢ', 'i': 'ᛁ', 'y': 'ᚤ',
-    's': 'ᛋ', 'é': 'ᛖ', 'r': 'ᚱ', 'n': 'ᚾ',
-    'c': 'ᚲ', 'o': 'ᛟ', 'p': 'ᛈ', 'q': 'ᚲ', 'f': 'ᚠ',
-    'g': 'ᚷ', 'j': 'ᛃ', 'k': 'ᚲ', 'v': 'ᚹ', 'w': 'ᚹ',
-    'x': 'ᚲᛋ', 'z': 'ᛉ',
-    '¿': '᛫', '?': '᛫', '.': '.',
-    'A': 'ᚨ', 'B': 'ᛒ', 'C': 'ᚲ', 'D': 'ᛞ', 'E': 'ᛖ', 'F': 'ᚠ',
-    'G': 'ᚷ', 'I': 'ᛁ', 'J': 'ᛃ', 'K': 'ᚲ', 'L': 'ᛚ', 'M': 'ᛗ',
-    'N': 'ᚾ', 'O': 'ᛟ', 'P': 'ᛈ', 'Q': 'ᚲ', 'R': 'ᚱ', 'S': 'ᛋ',
-    'T': 'ᛏ', 'U': 'ᚢ', 'V': 'ᚹ', 'W': 'ᚹ', 'X': 'ᚲᛋ', 'Y': 'ᚤ', 'Z': 'ᛉ'
-  };
+  // Mapeo EXACTO carácter por carácter del texto final a runas
+  // Cada posición en initialRunes corresponde exactamente a la misma posición en finalText
+  const runeMapping: string[] = [
+    'ᚺ', 'ᚨ', 'ᛒ', 'ᛚ', 'ᚨ', 'ᛗ', 'ᛖ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛏ', 'ᚢ', ' ', 'ᛁ', 'ᛞ', 'ᛖ', 'ᚨ', ',',
+    '\n',
+    'ᚤ', ' ', 'ᛋ', 'ᛖ', 'ᚱ', 'ᚨ', ' ', 'ᚱ', 'ᛖ', 'ᚨ', 'ᛚ',
+    '\n',
+    'ᚨ', 'ᚾ', 'ᛏ', 'ᛖ', 'ᛋ', ' ', 'ᛞ', 'ᛖ', ' ', 'ᛚ', 'ᛟ', ' ', 'ᚲ', 'ᚢ', 'ᛖ', ' ', 'ᛖ', 'ᛋ', 'ᛈ', 'ᛖ', 'ᚱ', 'ᚨ', 'ᛋ', '.'
+  ];
   
-  // Generar texto de runas basado en el texto final - misma longitud exacta
-  const runesText = titleText.split('').map(char => runesMap[char] || char).join('');
-  
-  // Array pre-calculado con los caracteres finales para asegurar que todas las runas se transformen completamente
-  const finalChars = titleText.split('');
+  // Array pre-calculado con los caracteres finales
+  const finalChars = finalText.split('');
 
   const poem1Lines = [
     "Describe tu proyecto,",
@@ -144,7 +132,7 @@ export default function App() {
         {/* Title Section with Runes Animation */}
         <div className="title-section">
           <h1 className="runes-text animate-runes">
-            {runesText.split('').map((rune, index) => (
+            {runeMapping.map((rune, index) => (
               <span 
                 key={index} 
                 className={`rune-char ${transformedChars[index] ? 'transformed' : ''}`}
@@ -163,7 +151,7 @@ export default function App() {
             {poem1Lines.map((line, index) => (
               <p key={index} className={`poem-line ${index < currentLine1 ? 'visible' : ''}`}>
                 {typedPoem1[index] || ''}
-                {index === currentLine1 - 1 && isTyping1 && <span className="cursor">|</span>}
+                {index === currentLine1 && isTyping1 && <span className="cursor">|</span>}
               </p>
             ))}
           </div>
@@ -173,7 +161,7 @@ export default function App() {
             {poem2Lines.map((line, index) => (
               <p key={index} className={`poem-line ${index < currentLine2 ? 'visible' : ''}`}>
                 {typedPoem2[index] || ''}
-                {index === currentLine2 - 1 && currentLine1 >= poem1Lines.length && <span className="cursor">|</span>}
+                {index === currentLine2 && currentLine1 >= poem1Lines.length && isTyping2 && <span className="cursor">|</span>}
               </p>
             ))}
           </div>
