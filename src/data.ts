@@ -320,7 +320,39 @@ export const TASAS_RESERVA: Record<string, number> = {
 /* Portafolio: mundos ya forjados                                      */
 /* ------------------------------------------------------------------ */
 
-export type Obra = { nombre: string; dominio: string; url: string; tono: "gold" | "mint" | "ember" };
+export type Obra = {
+  nombre: string;
+  dominio: string;
+  url: string;
+  desc: string;
+  img: string;
+  tono: "gold" | "mint" | "ember";
+};
 
 /** Añade aquí cada web terminada y aparecerá como tarjeta cuadrada clicable. */
-export const PORTAFOLIO: Obra[] = [];
+export const PORTAFOLIO: Obra[] = [
+  {
+    nombre: "LICUADO",
+    dominio: "licuado.licuado.workers.dev",
+    url: "https://licuado.licuado.workers.dev",
+    desc: "¡La web de mi estudio de videojuegos!",
+    img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjtCporqiLlQ39TGwXp3jm6CvXyVZosqKPhI7WRshUEq32shEr31llLvlmwbu4jVuBMf03uunYIjzXKp9Uhgt1T-dbEwB8JznIpto8NRwILcn9gzbw5jIhPHY63UG3ZHP_tlaVhytiD4xjP3MlxmhBHCjS06Jckcx3TbYWdUl-8SKy8R-xYrEKmrnadHAo/s1600/Captura%20de%20pantalla%20(21).png",
+    tono: "gold",
+  },
+  {
+    nombre: "Kronos",
+    dominio: "kronostl.netlify.app",
+    url: "https://kronostl.netlify.app",
+    desc: "Un editor visual para hacer líneas temporales con bifurcaciones, muy útil si estas escribiendo una historia que puede variar dependiendo de una desición.",
+    img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjTjHRp3YUYTiVxDB6yNZAvqEMrv5Ht-hyUTMqCfG7KQJ3HC5oyCtiloE_qo-fDGSXSwMVr5hjVyNXlbn05sIHN99SiacpWBljHzJgrs-22T0vLYXdoWnWou0DRF5m32pOJaL7Mc4lN4n7u2F22Q_p4APGVTz3Ei0fpwCHIk6D5diKD4xzZVLE1mnI5GTY/s1600/Captura%20de%20pantalla%20(25).png",
+    tono: "mint",
+  },
+  {
+    nombre: "Teia",
+    dominio: "teia-licuado.netlify.app",
+    url: "https://teia-licuado.netlify.app/",
+    desc: "Un panel visual donde puedes subir una carpeta de archivos y te devolverá una vista previa, muy útil.",
+    img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh1HTjLrLjwRquEIVZ7e4xCYlRn-zPMM84niIgAAu9A9SmGkv00ggMFSOsIhARQKK0EbdxTl-jqu92HlXKAHIEBjUk7F8VTIXSwhP8yb5NXK03KNfzWXitfPAMia3DcrMBWZg67HPFYs3RoFKg71Cj_3iJhqCyFPRPwNdJHSmanLq4x4GaEutWzBye84Kw/s1600/Captura%20de%20pantalla%20(23).png",
+    tono: "ember",
+  },
+];

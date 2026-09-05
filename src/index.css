@@ -300,6 +300,36 @@ details.oracle[open] .oracle-q { color: var(--color-gold-300); }
 
 .price-card-corp { border-color: rgba(227, 179, 65, 0.35); background: linear-gradient(160deg, rgba(34, 33, 26, 0.9), rgba(14, 20, 29, 0.96)); }
 
+/* ---------- portafolio ---------- */
+.obra-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(242, 233, 213, 0.07) 48%,
+    rgba(242, 233, 213, 0.12) 52%,
+    transparent 65%
+  );
+  transform: translateX(-140%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.obra-card:hover .obra-shine { transform: translateX(140%); }
+
+/* ---------- menú de moneda ---------- */
+@keyframes menu-pop {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.menu-pop { animation: menu-pop 0.22s cubic-bezier(0.2, 0.8, 0.3, 1) both; transform-origin: top right; }
+
+.menu-scroll { scrollbar-width: thin; scrollbar-color: var(--color-gold-700) transparent; }
+.menu-scroll::-webkit-scrollbar { width: 6px; }
+.menu-scroll::-webkit-scrollbar-thumb { background: var(--color-gold-700); }
+.menu-scroll::-webkit-scrollbar-track { background: transparent; }
+
 /* ---------- calculadora ---------- */
 @keyframes count-pop {
   0% { transform: scale(1.28); filter: brightness(1.6); }

@@ -399,7 +399,7 @@ type EnvioStatus = "idle" | "sending" | "sent" | "fallback";
 type Errores = { nombre?: string; email?: string; idea?: string };
 
 function Calculator() {
-  const { formatMoney } = useCurrency();
+  const { formatMoney, code } = useCurrency();
   const [base, setBase] = useState<"basica" | "corp">("basica");
   const [redaccion, setRedaccion] = useState(0);
   const [grande, setGrande] = useState(0);
@@ -550,7 +550,7 @@ function Calculator() {
                           )}
                         </span>
                       </span>
-                      <span className="mt-1.5 block font-digital text-[12px] text-gold-400">{fmt(b.price)} $ COP</span>
+                      <span className="mt-1.5 block font-digital text-[12px] text-gold-400"><Money v={b.price} /></span>
                       <span className="mt-0.5 block font-digital text-[10px] tracking-[0.12em] text-parch-500">{b.note.toUpperCase()}</span>
                     </button>
                   );
@@ -602,7 +602,7 @@ function Calculator() {
                     <span className="font-display text-[15px] font-bold text-parch-100">Garantía de cambios · 1 año</span>
                   </span>
                   <span className="mt-1 block font-digital text-[10px] tracking-[0.12em] text-parch-500">
-                    +50.000 $ COP · LA DE 1 MES SIEMPRE VA INCLUÍDA GRATIS
+                    <Money v={P.garantia} sign="plus" className="text-parch-400" /> · LA DE 1 MES SIEMPRE VA INCLUÍDA GRATIS
                   </span>
                 </span>
                 <span className={`relative h-6 w-11 shrink-0 rounded-full border transition-colors duration-300 ${garantia ? "border-mint-400 bg-mint-500/30" : "border-ink-500 bg-ink-800"}`}>
@@ -663,23 +663,28 @@ function Calculator() {
                 {calc.ahorro > 0 && (
                   <li className="flex items-baseline justify-between gap-3 border-t border-dashed border-mint-500/30 pt-2.5">
                     <span className="font-digital text-[11px] tracking-[0.14em] text-mint-300">AHORRO «¡AMBOS!»</span>
-                    <span className="font-digital text-[13px] text-mint-400">−{fmt(calc.ahorro)}</span>
+                    <Money v={calc.ahorro} sign="minus" className="font-digital text-[13px] text-mint-400" />
                   </li>
                 )}
                 {calc.expressFee > 0 && (
                   <li className="flex items-baseline justify-between gap-3">
                     <span className="font-digital text-[11px] tracking-[0.14em] text-gold-300">EXPRÉS +10%</span>
-                    <span className="font-digital text-[13px] text-gold-300">+{fmt(calc.expressFee)}</span>
+                    <Money v={calc.expressFee} sign="plus" className="font-digital text-[13px] text-gold-300" />
                   </li>
                 )}
               </ul>
 
               <div className="mt-6 border-t border-ink-700 pt-5">
                 <p className="font-digital text-[10px] tracking-[0.26em] text-parch-500">TOTAL DEL PACTO</p>
-                <p key={calc.total} className="count-pop mt-2 font-digital text-[40px] leading-none text-gold-400" style={{ textShadow: "0 0 26px rgba(227,179,65,0.3)" }}>
-                  {fmt(calc.total)}
+                <p key={`${calc.total}-${code}`} className="count-pop mt-2 font-digital text-[40px] leading-none text-gold-400" style={{ textShadow: "0 0 26px rgba(227,179,65,0.3)" }}>
+                  {formatMoney(calc.total)}
                 </p>
-                <p className="mt-1 font-digital text-[11px] tracking-[0.18em] text-parch-500">$ COP · ENTREGA EN HASTA {paceData.weeks.toUpperCase()}</p>
+                <p className="mt-1 font-digital text-[11px] tracking-[0.18em] text-parch-500">{code} · ENTREGA EN HASTA {paceData.weeks.toUpperCase()}</p>
+                {code !== "COP" && (
+                  <p className="mt-2 border border-dashed border-gold-600/30 px-2.5 py-1.5 font-digital text-[9px] leading-relaxed tracking-[0.12em] text-parch-600">
+                    EL PACTO SE COBRA EN PESOS COLOMBIANOS ({fmt(calc.total)} $ COP) · ESTA ES SOLO UNA TRADUCCIÓN ORIENTATIVA
+                  </p>
+                )}
               </div>
 
               {/* sello del pacto: datos del cliente */}
