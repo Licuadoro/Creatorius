@@ -119,7 +119,6 @@ export function Header() {
         <nav className="hidden items-center gap-7 font-digital text-[11px] tracking-[0.2em] text-parch-300 lg:flex">
           <a href="#ritual" className="link-underline transition-colors hover:text-gold-300">EL RITUAL</a>
           <a href="#ofrendas" className="link-underline transition-colors hover:text-gold-300">OFRENDAS</a>
-          <a href="#oraculo" className="link-underline transition-colors hover:text-gold-300">ORÁCULO</a>
         </nav>
 
         <div className="flex items-center gap-4">

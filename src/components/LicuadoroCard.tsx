@@ -156,9 +156,11 @@ export default function LicuadoroCard() {
         </dl>
 
         <a
-          href={LICUADO_URL}
-          target="_blank"
-          rel="noreferrer"
+          href="#calculadora"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("calculadora")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
           className="group mt-5 flex w-full items-center justify-center gap-2 border border-gold-500/60 bg-gold-400/[0.07] py-3 font-digital text-[12px] tracking-[0.22em] text-gold-300 transition-all duration-300 hover:bg-gold-400 hover:text-ink-900 hover:shadow-[0_0_34px_rgba(227,179,65,0.35)]"
         >
           ENCARGAR UNA WEB

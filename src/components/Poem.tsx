@@ -82,20 +82,6 @@ export default function Poem() {
             </span>
           ))}
         </p>
-
-        {/* rúbrica que se dibuja al terminar */}
-        <svg
-          viewBox="0 0 300 36"
-          className={`signature mt-7 h-8 w-56 text-gold-400 ${done ? "on" : ""}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          aria-hidden="true"
-        >
-          <path d="M4 22 C 34 4, 52 32, 78 16 S 122 8, 142 20 S 188 30, 214 14 S 262 8, 292 18" />
-          <path d="M12 30 C 90 24, 190 26, 284 22" opacity="0.55" strokeWidth="1.2" />
-        </svg>
       </div>
     </div>
   );

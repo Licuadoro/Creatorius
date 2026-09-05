@@ -2,7 +2,7 @@ import { Ambient, Footer, Header, Marquee } from "./components/Chrome";
 import RuneText from "./components/RuneText";
 import LicuadoroCard from "./components/LicuadoroCard";
 import Poem from "./components/Poem";
-import { Process, Oracle } from "./components/Sections";
+import { Process } from "./components/Sections";
 import { Ofrendas } from "./components/Pricing";
 import { useReducedMotion } from "./hooks";
 
@@ -58,7 +58,6 @@ export default function App() {
         <Marquee />
         <Process />
         <Ofrendas />
-        <Oracle />
       </main>
       <Footer />
     </div>

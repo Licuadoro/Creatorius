@@ -315,6 +315,11 @@ function Stepper({
   );
 }
 
+const DESTINO = "licuadorodelicuado@gmail.com";
+
+type EnvioStatus = "idle" | "sending" | "sent" | "fallback";
+type Errores = { nombre?: string; email?: string; idea?: string };
+
 function Calculator() {
   const [base, setBase] = useState<"basica" | "corp">("basica");
   const [redaccion, setRedaccion] = useState(0);
@@ -323,6 +328,13 @@ function Calculator() {
   const [paginas, setPaginas] = useState(0);
   const [garantia, setGarantia] = useState(false);
   const [pace, setPace] = useState<PaceId>("sin");
+
+  /* ---- sello del pacto: datos del cliente ---- */
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [idea, setIdea] = useState("");
+  const [errores, setErrores] = useState<Errores>({});
+  const [envio, setEnvio] = useState<EnvioStatus>("idle");
 
   const ambos = redaccion + grande >= 2;
 
@@ -351,8 +363,70 @@ function Calculator() {
   if (paginas > 0) rows.push({ label: `Páginas adicionales ×${paginas}`, value: fmt(calc.pCost) });
   if (garantia) rows.push({ label: "Garantía de cambios · 1 año", value: fmt(calc.gar) });
 
+  /* ---- el envío del pacto ---- */
+
+  const detalles: Record<string, string> = {
+    "Web base":
+      base === "basica"
+        ? `Web básica — ${fmt(P.basica)} $ COP`
+        : `Web corporativa (incluye 5 páginas) — ${fmt(P.corp)} $ COP`,
+    "Redacción": redaccion > 0 ? `${redaccion} párrafo(s) — ${fmt(calc.rCost)} $ COP` : "No incluida",
+    "Ilustración grande": grande > 0 ? `${grande} — ${fmt(calc.gCost)} $ COP` : "No incluida",
+    "Dibujo pequeño": dibujo > 0 ? `${dibujo} — ${fmt(calc.dCost)} $ COP` : "No incluido",
+    "Páginas adicionales": paginas > 0 ? `${paginas} — ${fmt(calc.pCost)} $ COP` : "Ninguna",
+    "Garantía de cambios (1 año)": garantia ? `Sí — ${fmt(P.garantia)} $ COP` : "No (va incluida la gratis de 1 mes)",
+    "Descuento «¡Ambos!»": ambos ? `Activo — ahorro de ${fmt(calc.ahorro)} $ COP` : "No activo",
+    "Ritmo de entrega": `${paceData.title} — ${paceData.sub}`,
+    ...(calc.expressFee > 0 ? { "Recargo Exprés (+10%)": `${fmt(calc.expressFee)} $ COP` } : {}),
+    "TOTAL DEL PACTO": `${fmt(calc.total)} $ COP`,
+  };
+
+  const enviar = async () => {
+    const e: Errores = {};
+    if (!nombre.trim()) e.nombre = "Falta tu nombre o cómo quieres que te llame.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) e.email = "Escribe un correo válido para poder responderte.";
+    if (idea.trim().length < 10) e.idea = "Cuéntame un poco más de tu idea (unas 10 letras al menos).";
+    setErrores(e);
+    if (e.nombre || e.email || e.idea) return;
+
+    setEnvio("sending");
+    const asunto = `Nuevo pacto en Creatorius — ${nombre.trim()}`;
+    const payload = {
+      _subject: asunto,
+      _template: "table",
+      _captcha: "false",
+      Nombre: nombre.trim(),
+      "Su correo": email.trim(),
+      "Descripción de la idea": idea.trim(),
+      ...detalles,
+    };
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${DESTINO}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("envío fallido");
+      setEnvio("sent");
+    } catch {
+      // respaldo: componer el correo en el gestor del visitante
+      const cuerpo = [
+        `Nombre: ${nombre.trim()}`,
+        `Correo: ${email.trim()}`,
+        "",
+        "Descripción de la idea:",
+        idea.trim(),
+        "",
+        "— Elementos del pacto —",
+        ...Object.entries(detalles).map(([k, v]) => `${k}: ${v}`),
+      ].join("\n");
+      window.location.href = `mailto:${DESTINO}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+      setEnvio("fallback");
+    }
+  };
+
   return (
-    <div className="mt-24">
+    <div id="calculadora" className="mt-24 scroll-mt-28">
       <Reveal>
         <p className="font-digital text-[11px] tracking-[0.3em] text-gold-500">
           <span className="text-mint-400">//</span> LA CALCULADORA DEL PACTO
@@ -493,8 +567,8 @@ function Calculator() {
             </div>
           </div>
 
-          {/* -------- resumen -------- */}
-          <aside className="h-fit border border-gold-600/30 bg-ink-850/90 lg:sticky lg:top-28">
+          {/* -------- resumen + sello del pacto -------- */}
+          <aside className="h-fit border border-gold-600/30 bg-ink-850/90 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
             <div className="border-b border-ink-700 px-6 py-4">
               <p className="font-digital text-[10px] tracking-[0.26em] text-parch-500">PERGAMINO DEL PACTO</p>
             </div>
@@ -528,17 +602,106 @@ function Calculator() {
                 <p className="mt-1 font-digital text-[11px] tracking-[0.18em] text-parch-500">$ COP · ENTREGA EN HASTA {paceData.weeks.toUpperCase()}</p>
               </div>
 
-              <a
-                href={LICUADO_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="group mt-6 flex items-center justify-center gap-3 bg-gold-400 px-5 py-3.5 font-digital text-[11px] tracking-[0.2em] text-ink-900 transition-all duration-300 hover:shadow-[0_0_36px_rgba(227,179,65,0.45)] hover:brightness-110"
-              >
-                CERRAR EL PACTO
-                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2.5 8h11M9.5 4l4 4-4 4" />
-                </svg>
-              </a>
+              {/* sello del pacto: datos del cliente */}
+              <div className="mt-6 border-t border-ink-700 pt-5">
+                <p className="font-digital text-[10px] tracking-[0.26em] text-gold-500">TU PARTE DEL PACTO</p>
+
+                <label className="mt-4 block">
+                  <span className="font-digital text-[9px] tracking-[0.18em] text-parch-500">
+                    TU NOMBRE O CÓMO QUIERES QUE TE LLAME
+                  </span>
+                  <input
+                    type="text"
+                    value={nombre}
+                    maxLength={60}
+                    onChange={(ev) => setNombre(ev.target.value)}
+                    placeholder="Ej.: Luna"
+                    className={`pacto-input mt-1.5 ${errores.nombre ? "err" : ""}`}
+                  />
+                  {errores.nombre && <span className="campo-err">{errores.nombre}</span>}
+                </label>
+
+                <label className="mt-3.5 block">
+                  <span className="font-digital text-[9px] tracking-[0.18em] text-parch-500">
+                    TU CORREO PARA RESPONDERTE
+                  </span>
+                  <input
+                    type="email"
+                    value={email}
+                    maxLength={80}
+                    onChange={(ev) => setEmail(ev.target.value)}
+                    placeholder="tucorreo@ejemplo.com"
+                    className={`pacto-input mt-1.5 ${errores.email ? "err" : ""}`}
+                  />
+                  {errores.email && <span className="campo-err">{errores.email}</span>}
+                </label>
+
+                <label className="mt-3.5 block">
+                  <span className="font-digital text-[9px] tracking-[0.18em] text-parch-500">
+                    DESCRIBE TU IDEA
+                  </span>
+                  <textarea
+                    value={idea}
+                    rows={4}
+                    maxLength={2000}
+                    onChange={(ev) => setIdea(ev.target.value)}
+                    placeholder="¿Qué mundo quieres que exista? Cuéntamelo como se lo contarías a un amigo…"
+                    className={`pacto-input mt-1.5 ${errores.idea ? "err" : ""}`}
+                  />
+                  {errores.idea && <span className="campo-err">{errores.idea}</span>}
+                </label>
+              </div>
+
+              {/* cierre del pacto */}
+              {envio === "sent" ? (
+                <div className="mt-6 border border-mint-500/50 bg-mint-500/[0.08] px-5 py-4 text-center">
+                  <p className="font-display text-[15px] font-bold tracking-wide text-mint-300">¡PACTO SELLADO!</p>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-parch-300/90">
+                    Tu pacto voló hacia {DESTINO}. Te responderé a tu correo muy pronto.
+                  </p>
+                  <button
+                    onClick={() => { setEnvio("idle"); setNombre(""); setEmail(""); setIdea(""); setErrores({}); }}
+                    className="link-underline mt-3 font-digital text-[10px] tracking-[0.18em] text-mint-400"
+                  >
+                    FORJAR OTRO PACTO
+                  </button>
+                </div>
+              ) : envio === "fallback" ? (
+                <div className="mt-6 border border-gold-500/50 bg-gold-500/[0.07] px-5 py-4 text-center">
+                  <p className="font-display text-[14px] font-bold tracking-wide text-gold-300">CASI LO TENEMOS</p>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-parch-300/90">
+                    Se abrió tu gestor de correo con el pacto ya escrito, listo para enviarse a {DESTINO}.
+                  </p>
+                  <button
+                    onClick={() => setEnvio("idle")}
+                    className="link-underline mt-3 font-digital text-[10px] tracking-[0.18em] text-gold-400"
+                  >
+                    INTENTAR EL ENVÍO DIRECTO
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={enviar}
+                  disabled={envio === "sending"}
+                  className="group mt-6 flex w-full items-center justify-center gap-3 bg-gold-400 px-5 py-3.5 font-digital text-[11px] tracking-[0.2em] text-ink-900 transition-all duration-300 enabled:hover:shadow-[0_0_36px_rgba(227,179,65,0.45)] enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:opacity-70"
+                >
+                  {envio === "sending" ? (
+                    <>
+                      <svg viewBox="0 0 20 20" className="h-4 w-4 animate-spin" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                        <path d="M10 2a8 8 0 1 1-8 8" />
+                      </svg>
+                      FORJANDO EL MENSAJE…
+                    </>
+                  ) : (
+                    <>
+                      CERRAR EL PACTO
+                      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2.5 8h11M9.5 4l4 4-4 4" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              )}
               <p className="mt-4 text-center font-digital text-[9px] tracking-[0.14em] text-parch-600">
                 EL PRECIO FINAL SE NEGOCIA · NADA SE COBRA SIN ACUERDO
               </p>

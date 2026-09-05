@@ -111,63 +111,6 @@ export function Process() {
 
 
 
-/* ---------------- El oráculo ---------------- */
 
-const ORACLE_QA = [
-  {
-    q: "¿Cuánto tarda en existir mi web?",
-    a: "Depende del mundo: una chispa (landing) suele tomar días; una forja completa, un par de semanas. El plazo se fija en el pacto y se cumple: los dioses también entregan a tiempo.",
-  },
-  {
-    q: "¿Cómo funciona el pago?",
-    a: "Como acordemos: por hitos, una mitad al empezar y otra al entregar, o todo al final si la confianza ya está forjada. El precio se negocia antes de mover un solo píxel.",
-  },
-  {
-    q: "¿Y si no me gusta lo que veo?",
-    a: "Vuelvo a la forja. Los ajustes razonables entran en el pacto; prefiero mil veces una web que ames a una que simplemente toleres.",
-  },
-  {
-    q: "¿De verdad escribes los textos e ilustras los elementos?",
-    a: "Sí. Si me lo pides, redactaré los textos e ilustraré los elementos, exactamente como promete el conjuro. Tú traes la idea; yo pongo hasta la última coma y la última línea.",
-  },
-  {
-    q: "¿Quién está detrás de Creatorius?",
-    a: "Licuadoro, único miembro de LICUADO: un estudio de videojuegos con más ambición que personal que germina como un azafrán entre el asfalto. Cada web que encargas riega ese sueño.",
-  },
-];
 
-export function Oracle() {
-  return (
-    <section id="oraculo" className="relative mx-auto w-full max-w-4xl px-6 py-24 lg:py-32">
-      <SectionHeading
-        kicker="EL ORÁCULO"
-        title={
-          <>
-            Pregunta sin <span className="text-gold-400">miedo</span>
-          </>
-        }
-        accent="Las dudas que todo el mundo trae al templo. Si la tuya no está, el oráculo responde en persona: escríbeme."
-      />
 
-      <div className="space-y-3">
-        {ORACLE_QA.map((item, i) => (
-          <Reveal key={i} delay={i * 70}>
-            <details className="oracle group border border-ink-600/70 bg-ink-850/60 transition-colors duration-300 open:border-gold-500/40 hover:border-gold-600/40">
-              <summary className="flex items-center justify-between gap-4 px-6 py-5">
-                <span className="oracle-q font-body text-[15.5px] font-semibold text-parch-100 transition-colors duration-300">
-                  {item.q}
-                </span>
-                <span className="oracle-icon flex h-8 w-8 shrink-0 items-center justify-center border border-gold-600/40 text-gold-400">
-                  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                    <path d="M8 2v12M2 8h12" />
-                  </svg>
-                </span>
-              </summary>
-              <p className="px-6 pb-6 text-[14.5px] leading-relaxed text-parch-300/90">{item.a}</p>
-            </details>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
-}

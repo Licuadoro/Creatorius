@@ -322,6 +322,39 @@ details.oracle[open] .oracle-q { color: var(--color-gold-300); }
 }
 .ambos-on { animation: banner-glow 2.6s ease-in-out infinite; }
 
+/* ---------- campos del pacto ---------- */
+.pacto-input {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--color-ink-600);
+  background: rgba(7, 10, 15, 0.65);
+  padding: 0.6rem 0.8rem;
+  color: var(--color-parch-100);
+  font-family: var(--font-body, inherit);
+  font-size: 13.5px;
+  line-height: 1.5;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+.pacto-input::placeholder { color: var(--color-parch-700); }
+.pacto-input:focus {
+  outline: none;
+  border-color: var(--color-gold-400);
+  background: rgba(11, 16, 23, 0.95);
+  box-shadow: 0 0 0 1px rgba(227, 179, 65, 0.35), 0 0 24px -8px rgba(227, 179, 65, 0.45);
+}
+.pacto-input.err { border-color: var(--color-ember-400); }
+.pacto-input.err:focus { box-shadow: 0 0 0 1px rgba(226, 99, 90, 0.4), 0 0 24px -8px rgba(226, 99, 90, 0.45); }
+textarea.pacto-input { resize: vertical; min-height: 92px; }
+
+.campo-err {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--font-digital);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--color-ember-300);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
