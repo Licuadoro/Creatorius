@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import RuneGlyph from "./RuneGlyph";
-import { ANCIENT_MEANING, FLOATERS, LICUADO_URL, MARQUEE_ITEMS } from "../data";
+import { FLOATERS, MARQUEE_ITEMS } from "../data";
 import { useInView, useScramble } from "../hooks";
 
 /* ---------------- Reveal (aparición al hacer scroll) ---------------- */
@@ -168,84 +168,4 @@ export function Marquee() {
   );
 }
 
-/* ---------------- Pie / contacto ---------------- */
 
-export function Footer() {
-  return (
-    <footer id="contacto" className="relative mt-10 border-t border-gold-600/20">
-      <div className="mx-auto w-full max-w-7xl px-6 pb-10 pt-20 lg:pt-28">
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr]">
-          <Reveal>
-            <p className="font-digital text-[11px] tracking-[0.3em] text-gold-500">
-              <span className="text-mint-400">//</span> CONTACTO
-            </p>
-            <h2 className="mt-4 font-display text-4xl font-black leading-[1.08] tracking-wide text-parch-100 lg:text-6xl">
-              ¿FORJAMOS
-              <br />
-              <span className="text-gold-400">TU MUNDO?</span>
-            </h2>
-            <p className="mt-6 max-w-lg text-[15px] leading-relaxed text-parch-300/90">
-              Cuéntame la idea que te ronda. Sin fórmulas, sin cuestionarios eternos: una conversación,
-              un pacto honesto y tu web tomando forma. El precio se negocia mirándose a los ojos.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href={LICUADO_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-3 bg-gold-400 px-7 py-3.5 font-digital text-[12px] tracking-[0.22em] text-ink-900 transition-all duration-300 hover:shadow-[0_0_40px_rgba(227,179,65,0.45)] hover:brightness-110"
-              >
-                ESCRÍBEME VÍA LICUADO
-                <svg viewBox="0 0 16 16" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 13 13 3M6 3h7v7" />
-                </svg>
-              </a>
-              <a
-                href="#inicio"
-                className="font-digital text-[11px] tracking-[0.2em] text-parch-500 transition-colors hover:text-mint-400"
-              >
-                ↑ VOLVER A LAS RUNAS
-              </a>
-            </div>
-          </Reveal>
-
-          <Reveal delay={140} className="lg:justify-self-end">
-            <div className="relative max-w-sm border border-ink-600/80 bg-ink-850/80 p-6">
-              <RuneGlyph ch="g" className="absolute -right-4 -top-5 h-12 w-12 text-gold-500/30" strokeWidth={1.6} />
-              <p className="font-digital text-[10px] tracking-[0.28em] text-parch-500">DOGMAS DE LA CASA</p>
-              <ul className="mt-4 space-y-3 text-sm text-parch-300/90">
-                {[
-                  "Ninguna idea es demasiado rara.",
-                  "El precio se pacta antes, nunca después.",
-                  "Si no brilla, vuelve a la forja.",
-                  "Cada web es un mundo, no una plantilla.",
-                ].map((d, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <svg viewBox="0 0 10 10" className="mt-1.5 h-2 w-2 shrink-0 text-gold-500" aria-hidden="true">
-                      <path d="M5 0.5 L9.5 5 L5 9.5 L0.5 5 Z" fill="currentColor" />
-                    </svg>
-                    {d}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-        </div>
-
-        <div className="mt-16 flex flex-col items-start justify-between gap-6 border-t border-ink-700/80 pt-8 md:flex-row md:items-center">
-          <p className="max-w-md text-[13px] italic leading-relaxed text-parch-500">
-            «{ANCIENT_MEANING}»
-          </p>
-          <div className="flex items-center gap-5 font-digital text-[10px] tracking-[0.2em] text-parch-500">
-            <span>CREATORIUS © 2026</span>
-            <span className="hidden h-3 w-px bg-ink-600 sm:block" aria-hidden="true" />
-            <span>FORJADO A MANO Y A RUNA</span>
-            <a href={LICUADO_URL} target="_blank" rel="noreferrer" className="link-underline text-gold-500 transition-colors hover:text-gold-300">
-              LICUADO
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}

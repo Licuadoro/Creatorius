@@ -45,7 +45,6 @@ export default function Poem() {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const count = useTypewriter(inView, reduced);
-  const done = count >= POEM_TEXT.length;
 
   let remaining = count;
   const rendered = POEM_LINES.map((line, li) => {
@@ -53,8 +52,6 @@ export default function Poem() {
     remaining -= line.length;
     return { line, take, li };
   });
-
-  const caretIdx = rendered.findIndex((r) => r.take < r.line.length);
 
   return (
     <div ref={ref}>
@@ -70,14 +67,6 @@ export default function Poem() {
           {rendered.map(({ line, take, li }) => (
             <span key={li}>
               {line.slice(0, take)}
-              {!done && caretIdx === li && (
-                <span className="pen-caret" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19.5 3.5 8.5 14.5l-1.8 4.6a.5.5 0 0 0 .65.65L12 17.9 23 6.9z" transform="translate(-1.5 -1)" />
-                    <path d="m16.5 6.5 3 3" />
-                  </svg>
-                </span>
-              )}
               {li < rendered.length - 1 ? "\n" : ""}
             </span>
           ))}

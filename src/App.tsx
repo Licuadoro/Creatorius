@@ -1,4 +1,4 @@
-import { Ambient, Footer, Header, Marquee } from "./components/Chrome";
+import { Ambient, Header, Marquee } from "./components/Chrome";
 import RuneText from "./components/RuneText";
 import LicuadoroCard from "./components/LicuadoroCard";
 import Poem from "./components/Poem";
@@ -59,7 +59,6 @@ export default function App() {
         <Process />
         <Ofrendas />
       </main>
-      <Footer />
     </div>
   );
 }

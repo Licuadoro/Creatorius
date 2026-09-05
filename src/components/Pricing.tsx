@@ -111,25 +111,25 @@ export function Ofrendas() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-12">
         {/* Web básica */}
-        <Card className="lg:col-span-4" delay={0}>
+        <Card className="lg:col-span-5" delay={0}>
           <CardHead sigil={<Sigil d={SIGILS.base} />} title="Web básica" />
-          <p className="mt-4 text-[14px] leading-relaxed text-parch-300/90">Una web simple de una sola página.</p>
+          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">Una web simple de una sola página.</p>
           <PriceBlock amount="190.000" />
         </Card>
 
         {/* + Redacción */}
-        <Card className="lg:col-span-4" delay={80}>
+        <Card className="lg:col-span-7" delay={80}>
           <CardHead sigil={<Sigil d={SIGILS.quill} />} title="+ Redacción" />
-          <p className="mt-4 text-[14px] leading-relaxed text-parch-300/90">
+          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
             Se añaden textos llamativos y deliciosamente redactados por un escritor con experiencia. Si no se incluye, se usarán los textos que proporcione el cliente, o textos simples / generados por IA.
           </p>
           <PriceBlock amount="+20.000" unit="/párrafo" />
         </Card>
 
         {/* + Ilustración */}
-        <Card className="lg:col-span-4" delay={160}>
+        <Card className="lg:col-span-7" delay={160}>
           <CardHead sigil={<Sigil d={SIGILS.brush} />} title="+ Ilustración" />
-          <p className="mt-4 text-[14px] leading-relaxed text-parch-300/90">
+          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
             Ilustración hecha a mano por un gran dibujante: un toque original, cercano y orgánico que atrae usuarios.{" "}
             <a href={LICUADO_URL} target="_blank" rel="noreferrer" className="link-underline text-mint-400 transition-colors hover:text-mint-300">
               Ver ejemplo.
@@ -140,18 +140,18 @@ export function Ofrendas() {
         </Card>
 
         {/* + Páginas adicionales (básica) */}
-        <Card className="lg:col-span-4" delay={0}>
+        <Card className="lg:col-span-5" delay={0}>
           <CardHead sigil={<Sigil d={SIGILS.pages} />} title="+ Páginas adicionales" />
-          <p className="mt-4 text-[14px] leading-relaxed text-parch-300/90">
+          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
             ¡Puedes añadir una página a la web por solo 60.000 $ COP! Ojo: las páginas adicionales no entran en el descuento «¡Ambos!».
           </p>
           <PriceBlock amount="+60.000" unit="/página" />
         </Card>
 
         {/* «¡Ambos!» */}
-        <Card className="price-card-ambos lg:col-span-8" delay={100}>
+        <Card className="price-card-ambos lg:col-span-12" delay={100}>
           <CardHead sigil={<Sigil d={SIGILS.knot} />} title="«¡Ambos!»" />
-          <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-parch-300/90">
+          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-parch-300/90">
             Si pides 2 o más añadidos entre redacción e ilustración grande, todo lo adicional sale con descuento:
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -174,18 +174,18 @@ export function Ofrendas() {
         </Card>
 
         {/* Garantía */}
-        <Card className="lg:col-span-4" delay={0}>
+        <Card className="lg:col-span-5" delay={0}>
           <CardHead sigil={<Sigil d={SIGILS.shield} />} title="Garantía de cambios · 1 año" tag="TRANQUILIDAD BARATA" tone="mint" />
-          <p className="mt-4 text-[14px] leading-relaxed text-parch-300/90">
+          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
             Por +50.000 $ COP, durante los 12 meses tras la entrega los cambios y retoques van incluidos. Siempre va incluída una garantía gratis de 1 mes.
           </p>
           <PriceBlock amount="+50.000" accent="text-mint-400" />
         </Card>
 
         {/* Corporativa */}
-        <Card className="price-card-corp lg:col-span-8" delay={100}>
+        <Card className="price-card-corp lg:col-span-7" delay={100}>
           <CardHead sigil={<Sigil d={SIGILS.tower} />} title="¿Necesitas 5 páginas? Empieza por la corporativa" tag="SALE MÁS BARATA" />
-          <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-parch-300/90">
+          <p className="mt-4 max-w-none text-[15px] leading-relaxed text-parch-300/90">
             La web corporativa incluye 5 páginas por 390.000 $ COP. Haz cuentas: básica + 4 páginas adicionales serían 430.000 $ COP — te ahorras 40.000 $ COP.
           </p>
           <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-2">
@@ -203,7 +203,7 @@ export function Ofrendas() {
             <div>
               <CardHead sigil={<Sigil d={SIGILS.plus} />} title="+ Páginas adicionales" tag="NO ENTRA EN EL DESCUENTO «¡AMBOS!»" tone="red" />
             </div>
-            <p className="text-[14px] leading-relaxed text-parch-300/90">
+            <p className="text-[15px] leading-relaxed text-parch-300/90">
               ¡Puedes añadir una página a la web por solo esto! Cada página extra mantiene el mismo mimo que la primera. Eso sí: las páginas van siempre a tarifa, sin descuento «¡Ambos!».
             </p>
             <div className="lg:text-right">
@@ -568,7 +568,7 @@ function Calculator() {
           </div>
 
           {/* -------- resumen + sello del pacto -------- */}
-          <aside className="h-fit border border-gold-600/30 bg-ink-850/90 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+          <aside className="border border-gold-600/30 bg-ink-850/90">
             <div className="border-b border-ink-700 px-6 py-4">
               <p className="font-digital text-[10px] tracking-[0.26em] text-parch-500">PERGAMINO DEL PACTO</p>
             </div>
