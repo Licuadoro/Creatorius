@@ -9,17 +9,21 @@ export default function App() {
   const [isTyping1, setIsTyping1] = useState(false);
   const [isTyping2, setIsTyping2] = useState(false);
   
-  // Texto final exacto dividido en varias líneas - este es el texto al que se transformarán las runas
-  // Dividido cuidadosamente para evitar cortes de palabras en cualquier pantalla
-  const finalText = "¿Tienes una idea?\nHábla conmigo\ny será real antes\nde lo que esperas.";
+  // Texto final exacto dividido en 4 líneas fijas - este es el texto al que se transformarán las runas
+  // Cada línea es independiente para garantizar exactamente 4 líneas en cualquier pantalla
+  const finalTextLines = [
+    "¿Tienes una idea?",
+    "Hábla conmigo",
+    "y será real antes",
+    "de lo que esperas."
+  ];
   
   // Estado para la animación de transformación de runas a texto
   const [transformedChars, setTransformedChars] = useState<string[]>([]);
   const [isTransforming, setIsTransforming] = useState(true);
   
   // Mapeo EXACTO carácter por carácter del texto final a runas
-  // Cada posición en runeMapping corresponde exactamente a la misma posición en finalText
-  // Texto: "¿Tienes una idea?\nHábla conmigo\ny será real antes\nde lo que esperas."
+  // Texto: 4 líneas separadas
   const runeMapping: string[] = [
     // Línea 1: "¿Tienes una idea?" (17 caracteres)
     'ᛉ',  // ¿
@@ -41,7 +45,7 @@ export default function App() {
     '?',  // ?
     // Salto de línea 1
     '\n',
-    // Línea 2: "Hábla conmigo" (14 caracteres + á)
+    // Línea 2: "Hábla conmigo" (13 caracteres)
     'ᚻ',  // H
     'ᚨ',  // á (usamos ᚨ para a/á)
     'ᛒ',  // b
@@ -55,8 +59,9 @@ export default function App() {
     'ᛁ',  // i
     'ᚷ',  // g
     'ᛟ',  // o
+    // Salto de línea 2
     '\n',
-    // Línea 3: "y será real antes" (18 caracteres)
+    // Línea 3: "y será real antes" (17 caracteres)
     'ᚤ',  // y
     ' ',  // espacio
     'ᛋ',  // s
@@ -74,8 +79,9 @@ export default function App() {
     'ᛏ',  // t
     'ᛖ',  // e
     'ᛋ',  // s
+    // Salto de línea 3
     '\n',
-    // Línea 4: "de lo que esperas." (19 caracteres)
+    // Línea 4: "de lo que esperas." (18 caracteres)
     'ᛞ',  // d
     'ᛖ',  // e
     ' ',  // espacio
@@ -97,7 +103,7 @@ export default function App() {
   ];
   
   // Array pre-calculado con los caracteres finales
-  const finalChars = finalText.split('');
+  const finalChars = [...finalTextLines.join('\n')];
 
   const poem1Lines = [
     "Describe tu proyecto,",
@@ -204,13 +210,20 @@ export default function App() {
           {/* Title Section with Runes Animation */}
           <div className="title-section">
             <h1 className="runes-text animate-runes">
-              {runeMapping.map((rune, index) => (
-                <span 
-                  key={index} 
-                  className={`rune-char ${transformedChars[index] ? 'transformed' : ''}`}
-                  style={{ transitionDelay: `${index * 80}ms` }}
-                >
-                  {transformedChars[index] !== undefined ? transformedChars[index] : rune}
+              {finalTextLines.map((line, lineIndex) => (
+                <span key={lineIndex} className="rune-line">
+                  {line.split('').map((char, charIndex) => {
+                    const globalIndex = finalTextLines.slice(0, lineIndex).reduce((acc, l) => acc + l.length + 1, 0) + charIndex;
+                    return (
+                      <span 
+                        key={charIndex} 
+                        className={`rune-char ${transformedChars[globalIndex] ? 'transformed' : ''}`}
+                        style={{ transitionDelay: `${globalIndex * 80}ms` }}
+                      >
+                        {transformedChars[globalIndex] !== undefined ? transformedChars[globalIndex] : runeMapping[globalIndex]}
+                      </span>
+                    );
+                  })}
                 </span>
               ))}
             </h1>
