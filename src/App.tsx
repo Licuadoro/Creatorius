@@ -210,22 +210,30 @@ export default function App() {
           {/* Title Section with Runes Animation */}
           <div className="title-section">
             <h1 className="runes-text animate-runes">
-              {finalTextLines.map((line, lineIndex) => (
-                <span key={lineIndex} className="rune-line">
-                  {line.split('').map((char, charIndex) => {
-                    const globalIndex = finalTextLines.slice(0, lineIndex).reduce((acc, l) => acc + l.length + 1, 0) + charIndex;
-                    return (
-                      <span 
-                        key={charIndex} 
-                        className={`rune-char ${transformedChars[globalIndex] ? 'transformed' : ''}`}
-                        style={{ transitionDelay: `${globalIndex * 80}ms` }}
-                      >
-                        {transformedChars[globalIndex] !== undefined ? transformedChars[globalIndex] : runeMapping[globalIndex]}
-                      </span>
-                    );
-                  })}
-                </span>
-              ))}
+              {finalTextLines.map((line, lineIndex) => {
+                // Calcular el índice global inicial para esta línea
+                let globalStartIndex = 0;
+                for (let i = 0; i < lineIndex; i++) {
+                  globalStartIndex += finalTextLines[i].length;
+                }
+                
+                return (
+                  <span key={lineIndex} className="rune-line">
+                    {line.split('').map((char, charIndex) => {
+                      const globalIndex = globalStartIndex + charIndex;
+                      return (
+                        <span 
+                          key={charIndex} 
+                          className={`rune-char ${transformedChars[globalIndex] ? 'transformed' : ''}`}
+                          style={{ transitionDelay: `${globalIndex * 80}ms` }}
+                        >
+                          {transformedChars[globalIndex] !== undefined ? transformedChars[globalIndex] : runeMapping[globalIndex]}
+                        </span>
+                      );
+                    })}
+                  </span>
+                );
+              })}
             </h1>
           </div>
 
