@@ -18,15 +18,82 @@ export default function App() {
   const [isTransforming, setIsTransforming] = useState(true);
   
   // Mapeo EXACTO carácter por carácter del texto final a runas
-  // Cada posición en initialRunes corresponde exactamente a la misma posición en finalText
+  // Cada posición en runeMapping corresponde exactamente a la misma posición en finalText
+  // Texto: "¿Tienes una idea?\nHábla conmigo\ny será real antes\nde lo que esperas."
   const runeMapping: string[] = [
-    'ᚦ', 'ᛁ', 'ᛖ', 'ᚾ', 'ᛖᛋ', ' ', 'ᚢ', 'ᚾᚨ', ' ', 'ᛁ', 'ᛞ', 'ᛖᚨ', '?',
+    // Línea 1: "¿Tienes una idea?" (17 caracteres)
+    'ᛉ',  // ¿
+    'ᛏ',  // T
+    'ᛁ',  // i
+    'ᛖ',  // e
+    'ᚾ',  // n
+    'ᛖ',  // e
+    'ᛋ',  // s
+    ' ',  // espacio
+    'ᚢ',  // u
+    'ᚾ',  // n
+    'ᚨ',  // a
+    ' ',  // espacio
+    'ᛁ',  // i
+    'ᛞ',  // d
+    'ᛖ',  // e
+    'ᚨ',  // a
+    '?',  // ?
+    // Salto de línea 1
     '\n',
-    'ᚺ', 'ᚨ', 'ᛒ', 'ᛚᚨ', ' ', 'ᚲ', 'ᛟ', 'ᚾ', 'ᛗ', 'ᛁ', 'ᚷ', 'ᛟ',
+    // Línea 2: "Hábla conmigo" (14 caracteres + á)
+    'ᚻ',  // H
+    'ᚨ',  // á (usamos ᚨ para a/á)
+    'ᛒ',  // b
+    'ᛚ',  // l
+    'ᚨ',  // a
+    ' ',  // espacio
+    'ᚲ',  // c
+    'ᛟ',  // o
+    'ᚾ',  // n
+    'ᛗ',  // m
+    'ᛁ',  // i
+    'ᚷ',  // g
+    'ᛟ',  // o
     '\n',
-    'ᚤ', ' ', 'ᛋ', 'ᛖ', 'ᚱ', 'ᚨ', ' ', 'ᚱ', 'ᛖᚨ', 'ᛚ', ' ', 'ᚨ', 'ᚾ', 'ᛏ', 'ᛖᛋ',
+    // Línea 3: "y será real antes" (18 caracteres)
+    'ᚤ',  // y
+    ' ',  // espacio
+    'ᛋ',  // s
+    'ᛖ',  // e
+    'ᚱ',  // r
+    'ᚨ',  // á (usamos ᚨ para a/á)
+    ' ',  // espacio
+    'ᚱ',  // r
+    'ᛖ',  // e
+    'ᚨ',  // a
+    'ᛚ',  // l
+    ' ',  // espacio
+    'ᚨ',  // a
+    'ᚾ',  // n
+    'ᛏ',  // t
+    'ᛖ',  // e
+    'ᛋ',  // s
     '\n',
-    'ᛞ', 'ᛖ', ' ', 'ᛚ', 'ᛟ', ' ', 'ᚦ', 'ᚢ', 'ᛖ', ' ', 'ᛖᛋᛈ', 'ᛖ', 'ᚱ', 'ᚨᛋ', '.'
+    // Línea 4: "de lo que esperas." (19 caracteres)
+    'ᛞ',  // d
+    'ᛖ',  // e
+    ' ',  // espacio
+    'ᛚ',  // l
+    'ᛟ',  // o
+    ' ',  // espacio
+    'ᚦ',  // q
+    'ᚢ',  // u
+    'ᛖ',  // e
+    ' ',  // espacio
+    'ᛖ',  // e
+    'ᛋ',  // s
+    'ᛈ',  // p
+    'ᛖ',  // e
+    'ᚱ',  // r
+    'ᚨ',  // a
+    'ᛋ',  // s
+    '.'   // .
   ];
   
   // Array pre-calculado con los caracteres finales
