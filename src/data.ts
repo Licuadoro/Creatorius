@@ -60,6 +60,9 @@ export const ANCIENT_MEANING =
 
 export const LICUADO_URL = "https://licuado.licuado.workers.dev";
 
+/** Ruta secreta de la mesa de recibos: solo se llega mediante el enlace que viaja en el correo. */
+export const RECIBO_HASH = "sello-x9q42";
+
 export const LICUADORO_PHOTO =
   "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbwhRnXPvUxggOGE4t5RFCC0CLWuAj7shFk4dxvgB0PHMjSg5dw-lVElDkyEGh0gN6PiFT_uDTPxnYS-j9gJcmmlmBR8FM9ohUgXRA4gHWcPNejaHUk9W3LW440ZMsBOFVS2LBsIpms5YmdnPIEUpG0YI8-EsoKxyay7XrckorCDjCbztBfDW0o3eHAss/s1600/1000068010.png";
 

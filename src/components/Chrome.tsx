@@ -126,12 +126,6 @@ export function Header() {
             <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-mint-400" />
             ABIERTO A ENCARGOS
           </span>
-          <a
-            href="#contacto"
-            className="border border-gold-500/60 bg-gold-400/[0.07] px-4 py-2 font-digital text-[11px] tracking-[0.18em] text-gold-300 transition-all duration-300 hover:bg-gold-400 hover:text-ink-900 hover:shadow-[0_0_28px_rgba(227,179,65,0.35)]"
-          >
-            ENCARGAR
-          </a>
         </div>
       </div>
     </header>

@@ -1,12 +1,12 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Reveal, SectionHeading } from "./Chrome";
-import { LICUADO_URL } from "../data";
+import { LICUADO_URL, RECIBO_HASH } from "../data";
 
 /* ============================================================
    PRECIOS
 ============================================================ */
 
-const P = {
+export const P = {
   basica: 190000,
   corp: 390000,
   redaccion: 20000,
@@ -19,213 +19,11 @@ const P = {
   garantia: 50000,
 };
 
-const fmt = (n: number) => n.toLocaleString("es-CO");
+export const fmt = (n: number) => n.toLocaleString("es-CO");
 
-/* ---------- sigilos dibujados a mano ---------- */
+export const MAX = { redaccion: 10, grande: 5, dibujo: 99, pagina: 10 };
 
-function Sigil({ d, className = "h-6 w-6" }: { d: ReactNode; className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`${className} pc-sigil text-gold-500`} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {d}
-    </svg>
-  );
-}
-
-const SIGILS = {
-  base: <><path d="M4 9.5 12 4l8 5.5V20H4z" /><path d="M9 20v-6h6v6" /></>,
-  quill: <><path d="M19 4c-6 0-11 5-12.5 11L5 19.5" /><path d="M19 4c0 6-5 11-11 12.5" /><path d="M8.5 15.5 5 19.5" /></>,
-  brush: <><path d="M18.5 3.5 9 13l2 2 9.5-9.5z" /><path d="M9 13c-2.5.5-3.5 2-4 5 3-.5 4.5-1.5 5-4" /></>,
-  pages: <><path d="M7 3h10v14H7z" /><path d="M4.5 6v14h10" /><path d="M10 7.5h4M10 10.5h4" /></>,
-  knot: <><path d="M8 4v10a4 4 0 0 0 8 0" /><path d="M16 20V10a4 4 0 0 0-8 0" /></>,
-  shield: <><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z" /><path d="m9 12 2.2 2.2L15.5 10" /></>,
-  tower: <><path d="M5 20h14M7 20V8l5-4 5 4v12" /><path d="M10 20v-4h4v4M10 11h4" /></>,
-  plus: <><path d="M12 5v14M5 12h14" /><path d="M4 4h3M17 4h3M4 20h3M17 20h3" opacity=".5" /></>,
-};
-
-/* ---------- tarjeta base ---------- */
-
-function Card({
-  children,
-  className = "",
-  delay = 0,
-  wide = false,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-  wide?: boolean;
-}) {
-  return (
-    <Reveal delay={delay} className={wide ? "lg:col-span-12" : ""}>
-      <article className={`price-card group h-full ${className}`}>
-        <span className="pc-corner pc-tl" aria-hidden="true" />
-        <span className="pc-corner pc-tr" aria-hidden="true" />
-        <span className="pc-corner pc-bl" aria-hidden="true" />
-        <span className="pc-corner pc-br" aria-hidden="true" />
-        {children}
-      </article>
-    </Reveal>
-  );
-}
-
-function CardHead({ sigil, title, tag, tone = "gold" }: { sigil: ReactNode; title: string; tag?: string; tone?: "gold" | "mint" | "red" }) {
-  const toneCls = tone === "mint" ? "border-mint-500/40 bg-mint-500/10 text-mint-300" : tone === "red" ? "border-red-400/40 bg-red-400/10 text-red-300" : "border-gold-500/40 bg-gold-500/10 text-gold-300";
-  return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex items-center gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center border border-ink-600 bg-ink-900/70">{sigil}</span>
-        <h3 className="font-display text-[17px] font-bold leading-snug text-parch-100">{title}</h3>
-      </div>
-      {tag && (
-        <span className={`shrink-0 border px-2 py-1 font-digital text-[9px] tracking-[0.16em] ${toneCls}`}>
-          {tag}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function PriceBlock({ amount, unit, note, accent = "text-gold-400" }: { amount: string; unit?: string; note?: string; accent?: string }) {
-  return (
-    <div className="mt-auto pt-5">
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <span className={`pc-price font-digital text-[26px] leading-none ${accent}`}>{amount}</span>
-        <span className="font-digital text-[11px] tracking-[0.14em] text-parch-400">$ COP</span>
-        {unit && <span className="font-digital text-[11px] tracking-[0.14em] text-parch-500">{unit}</span>}
-      </div>
-      {note && <p className="mt-2 font-digital text-[10px] tracking-[0.12em] text-parch-500">{note}</p>}
-    </div>
-  );
-}
-
-/* ---------- la sección completa ---------- */
-
-export function Ofrendas() {
-  return (
-    <section id="ofrendas" className="relative mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
-      <SectionHeading
-        kicker="OFRENDAS"
-        title={<>La tabla de <span className="text-gold-400">ofrendas</span></>}
-        accent="Todo pacto empieza por un número honesto. Estas son las tarifas de la casa: la base, sus añadidos y los descuentos que la propia forja concede."
-      />
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-12">
-        {/* Web básica */}
-        <Card className="lg:col-span-5" delay={0}>
-          <CardHead sigil={<Sigil d={SIGILS.base} />} title="Web básica" />
-          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">Una web simple de una sola página.</p>
-          <PriceBlock amount="190.000" />
-        </Card>
-
-        {/* + Redacción */}
-        <Card className="lg:col-span-7" delay={80}>
-          <CardHead sigil={<Sigil d={SIGILS.quill} />} title="+ Redacción" />
-          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
-            Se añaden textos llamativos y deliciosamente redactados por un escritor con experiencia. Si no se incluye, se usarán los textos que proporcione el cliente, o textos simples / generados por IA.
-          </p>
-          <PriceBlock amount="+20.000" unit="/párrafo" />
-        </Card>
-
-        {/* + Ilustración */}
-        <Card className="lg:col-span-7" delay={160}>
-          <CardHead sigil={<Sigil d={SIGILS.brush} />} title="+ Ilustración" />
-          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
-            Ilustración hecha a mano por un gran dibujante: un toque original, cercano y orgánico que atrae usuarios.{" "}
-            <a href={LICUADO_URL} target="_blank" rel="noreferrer" className="link-underline text-mint-400 transition-colors hover:text-mint-300">
-              Ver ejemplo.
-            </a>{" "}
-            Si no se incluye, se usará tu material o imágenes generadas por IA.
-          </p>
-          <PriceBlock amount="+30.000" unit="/grande" note="DIBUJO PEQUEÑO +3000 $ COP" />
-        </Card>
-
-        {/* + Páginas adicionales (básica) */}
-        <Card className="lg:col-span-5" delay={0}>
-          <CardHead sigil={<Sigil d={SIGILS.pages} />} title="+ Páginas adicionales" />
-          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
-            ¡Puedes añadir una página a la web por solo 60.000 $ COP! Ojo: las páginas adicionales no entran en el descuento «¡Ambos!».
-          </p>
-          <PriceBlock amount="+60.000" unit="/página" />
-        </Card>
-
-        {/* «¡Ambos!» */}
-        <Card className="price-card-ambos lg:col-span-12" delay={100}>
-          <CardHead sigil={<Sigil d={SIGILS.knot} />} title="«¡Ambos!»" />
-          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-parch-300/90">
-            Si pides 2 o más añadidos entre redacción e ilustración grande, todo lo adicional sale con descuento:
-          </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {[
-              { old: "20.000", neo: "17.000", unit: "/párrafo", off: "−14,29%" },
-              { old: "30.000", neo: "25.000", unit: "/grande", off: "−12,5%" },
-              { old: "3000", neo: "1500", unit: "/dibujo", off: "−50%" },
-            ].map((r) => (
-              <div key={r.unit} className="border border-gold-500/25 bg-ink-900/70 p-4 transition-all duration-500 group-hover:border-gold-500/50">
-                <p className="font-digital text-[12px] text-parch-500 line-through decoration-red-400/70">{r.old} $ COP</p>
-                <p className="mt-1 font-digital text-[22px] leading-none text-mint-400">
-                  {r.neo} <span className="text-[11px] text-parch-400">$ COP{r.unit}</span>
-                </p>
-                <span className="mt-3 inline-block border border-mint-500/40 bg-mint-500/10 px-2 py-0.5 font-digital text-[10px] tracking-[0.12em] text-mint-300">
-                  {r.off}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Garantía */}
-        <Card className="lg:col-span-5" delay={0}>
-          <CardHead sigil={<Sigil d={SIGILS.shield} />} title="Garantía de cambios · 1 año" tag="TRANQUILIDAD BARATA" tone="mint" />
-          <p className="mt-4 text-[15px] leading-relaxed text-parch-300/90">
-            Por +50.000 $ COP, durante los 12 meses tras la entrega los cambios y retoques van incluidos. Siempre va incluída una garantía gratis de 1 mes.
-          </p>
-          <PriceBlock amount="+50.000" accent="text-mint-400" />
-        </Card>
-
-        {/* Corporativa */}
-        <Card className="price-card-corp lg:col-span-7" delay={100}>
-          <CardHead sigil={<Sigil d={SIGILS.tower} />} title="¿Necesitas 5 páginas? Empieza por la corporativa" tag="SALE MÁS BARATA" />
-          <p className="mt-4 max-w-none text-[15px] leading-relaxed text-parch-300/90">
-            La web corporativa incluye 5 páginas por 390.000 $ COP. Haz cuentas: básica + 4 páginas adicionales serían 430.000 $ COP — te ahorras 40.000 $ COP.
-          </p>
-          <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-2">
-            <PriceBlock amount="390.000" />
-            <div className="pb-1">
-              <p className="font-digital text-[11px] tracking-[0.14em] text-parch-500">AHORRO FRENTE A BÁSICA + 4 PÁGINAS</p>
-              <p className="mt-1 font-digital text-[18px] leading-none text-mint-400">−40.000 $ COP</p>
-            </div>
-          </div>
-        </Card>
-
-        {/* + Páginas adicionales (corporativa) */}
-        <Card wide delay={0}>
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_1.4fr_auto] lg:items-center">
-            <div>
-              <CardHead sigil={<Sigil d={SIGILS.plus} />} title="+ Páginas adicionales" tag="NO ENTRA EN EL DESCUENTO «¡AMBOS!»" tone="red" />
-            </div>
-            <p className="text-[15px] leading-relaxed text-parch-300/90">
-              ¡Puedes añadir una página a la web por solo esto! Cada página extra mantiene el mismo mimo que la primera. Eso sí: las páginas van siempre a tarifa, sin descuento «¡Ambos!».
-            </p>
-            <div className="lg:text-right">
-              <p className="pc-price font-digital text-[26px] leading-none text-gold-400">+60.000 <span className="text-[11px] tracking-[0.14em] text-parch-400">$ COP</span></p>
-              <p className="mt-1 font-digital text-[11px] tracking-[0.14em] text-parch-500">POR PÁGINA</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <Calculator />
-    </section>
-  );
-}
-
-/* ============================================================
-   CALCULADORA DEL PACTO
-============================================================ */
-
-const MAX = { redaccion: 10, grande: 5, dibujo: 99, pagina: 10 };
-
-const PACES = [
+export const PACES = [
   {
     id: "sin",
     title: "Sin prisa",
@@ -252,7 +50,261 @@ const PACES = [
   },
 ] as const;
 
-type PaceId = (typeof PACES)[number]["id"];
+export type PaceId = (typeof PACES)[number]["id"];
+
+export type PactoCfg = {
+  base: "basica" | "corp";
+  r: number;
+  g: number;
+  d: number;
+  p: number;
+  w: boolean;
+  v: PaceId;
+};
+
+export function calcularPacto(cfg: PactoCfg) {
+  const ambos = cfg.r + cfg.g >= 2;
+  const baseCost = cfg.base === "basica" ? P.basica : P.corp;
+  const rCost = cfg.r * (ambos ? P.redaccionD : P.redaccion);
+  const gCost = cfg.g * (ambos ? P.grandeD : P.grande);
+  const dCost = cfg.d * (ambos ? P.dibujoD : P.dibujo);
+  const pCost = cfg.p * P.pagina;
+  const gar = cfg.w ? P.garantia : 0;
+  const subtotal = baseCost + rCost + gCost + dCost + pCost + gar;
+  const ahorro = ambos
+    ? cfg.r * (P.redaccion - P.redaccionD) + cfg.g * (P.grande - P.grandeD) + cfg.d * (P.dibujo - P.dibujoD)
+    : 0;
+  const expressFee = cfg.v === "express" ? Math.round(subtotal * 0.1) : 0;
+  const total = subtotal + expressFee;
+  return { ambos, baseCost, rCost, gCost, dCost, pCost, gar, subtotal, ahorro, expressFee, total };
+}
+
+/* ---------- sigilos dibujados a mano ---------- */
+
+function Sigil({ d, className = "h-6 w-6" }: { d: ReactNode; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`${className} pc-sigil text-gold-500`} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {d}
+    </svg>
+  );
+}
+
+const SIGILS = {
+  base: <><path d="M4 9.5 12 4l8 5.5V20H4z" /><path d="M9 20v-6h6v6" /></>,
+  quill: <><path d="M19 4c-6 0-11 5-12.5 11L5 19.5" /><path d="M19 4c0 6-5 11-11 12.5" /><path d="M8.5 15.5 5 19.5" /></>,
+  brush: <><path d="M18.5 3.5 9 13l2 2 9.5-9.5z" /><path d="M9 13c-2.5.5-3.5 2-4 5 3-.5 4.5-1.5 5-4" /></>,
+  pages: <><path d="M7 3h10v14H7z" /><path d="M4.5 6v14h10" /><path d="M10 7.5h4M10 10.5h4" /></>,
+  knot: <><path d="M8 4v10a4 4 0 0 0 8 0" /><path d="M16 20V10a4 4 0 0 0-8 0" /></>,
+  shield: <><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z" /><path d="m9 12 2.2 2.2L15.5 10" /></>,
+  tower: <><path d="M5 20h14M7 20V8l5-4 5 4v12" /><path d="M10 20v-4h4v4M10 11h4" /></>,
+  plus: <><path d="M12 5v14M5 12h14" /><path d="M4 4h3M17 4h3M4 20h3M17 20h3" opacity=".5" /></>,
+};
+
+/* ---------- banda ancha de ofrenda ---------- */
+
+function Band({
+  sigil,
+  title,
+  tag,
+  tone = "gold",
+  desc,
+  right,
+  delay = 0,
+  className = "",
+  children,
+}: {
+  sigil: ReactNode;
+  title: string;
+  tag?: string;
+  tone?: "gold" | "mint" | "red";
+  desc?: ReactNode;
+  right?: ReactNode;
+  delay?: number;
+  className?: string;
+  children?: ReactNode;
+}) {
+  const toneCls =
+    tone === "mint"
+      ? "border-mint-500/40 bg-mint-500/10 text-mint-300"
+      : tone === "red"
+        ? "border-red-400/40 bg-red-400/10 text-red-300"
+        : "border-gold-500/40 bg-gold-500/10 text-gold-300";
+  return (
+    <Reveal delay={delay}>
+      <article className={`price-card group w-full ${className}`}>
+        <span className="pc-corner pc-tl" aria-hidden="true" />
+        <span className="pc-corner pc-tr" aria-hidden="true" />
+        <span className="pc-corner pc-bl" aria-hidden="true" />
+        <span className="pc-corner pc-br" aria-hidden="true" />
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
+          <div className="flex items-center gap-4 lg:w-[330px] lg:shrink-0">
+            <span className="grid h-14 w-14 shrink-0 place-items-center border border-ink-600 bg-ink-900/70">
+              {sigil}
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-display text-[19px] font-bold leading-snug text-parch-100">{title}</h3>
+              {tag && (
+                <span className={`mt-2 inline-block border px-2 py-1 font-digital text-[9px] tracking-[0.16em] ${toneCls}`}>
+                  {tag}
+                </span>
+              )}
+            </div>
+          </div>
+          {desc && <div className="min-w-0 flex-1 text-[15.5px] leading-relaxed text-parch-300/95">{desc}</div>}
+          {right && <div className="shrink-0 lg:w-[230px] lg:text-right">{right}</div>}
+        </div>
+        {children}
+      </article>
+    </Reveal>
+  );
+}
+
+function Big({ amount, unit, note, accent = "text-gold-400" }: { amount: string; unit?: string; note?: string; accent?: string }) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 lg:justify-end">
+        <span className={`pc-price font-digital text-[32px] leading-none ${accent}`}>{amount}</span>
+        <span className="font-digital text-[12px] tracking-[0.14em] text-parch-400">$ COP</span>
+        {unit && <span className="font-digital text-[12px] tracking-[0.14em] text-parch-500">{unit}</span>}
+      </div>
+      {note && <p className="mt-2 font-digital text-[11px] tracking-[0.14em] text-parch-500">{note}</p>}
+    </div>
+  );
+}
+
+/* ---------- la sección completa ---------- */
+
+export function Ofrendas() {
+  return (
+    <section id="ofrendas" className="relative mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
+      <SectionHeading
+        kicker="OFRENDAS"
+        title={<>La tabla de <span className="text-gold-400">ofrendas</span></>}
+        accent="Todo pacto empieza por un número honesto. Estas son las tarifas de la casa: la base, sus añadidos y los descuentos que la propia forja concede."
+      />
+
+      <div className="space-y-5">
+        {/* Web básica */}
+        <Band
+          sigil={<Sigil d={SIGILS.base} className="h-7 w-7" />}
+          title="Web básica"
+          desc="Una web simple de una sola página."
+          right={<Big amount="190.000" />}
+          delay={0}
+        />
+
+        {/* + Redacción */}
+        <Band
+          sigil={<Sigil d={SIGILS.quill} className="h-7 w-7" />}
+          title="+ Redacción"
+          desc="Se añaden textos llamativos y deliciosamente redactados por un escritor con experiencia. Si no se incluye, se usarán los textos que proporcione el cliente, o textos simples / generados por IA."
+          right={<Big amount="+20.000" unit="/párrafo" />}
+          delay={70}
+        />
+
+        {/* + Ilustración */}
+        <Band
+          sigil={<Sigil d={SIGILS.brush} className="h-7 w-7" />}
+          title="+ Ilustración"
+          desc={
+            <>
+              Ilustración hecha a mano por un gran dibujante: un toque original, cercano y orgánico que atrae usuarios.{" "}
+              <a href={LICUADO_URL} target="_blank" rel="noreferrer" className="link-underline text-mint-400 transition-colors hover:text-mint-300">
+                Ver ejemplo.
+              </a>{" "}
+              Si no se incluye, se usará tu material o imágenes generadas por IA.
+            </>
+          }
+          right={<Big amount="+30.000" unit="/grande" note="DIBUJO PEQUEÑO +3000 $ COP" />}
+          delay={140}
+        />
+
+        {/* + Páginas adicionales (básica) */}
+        <Band
+          sigil={<Sigil d={SIGILS.pages} className="h-7 w-7" />}
+          title="+ Páginas adicionales"
+          desc="¡Puedes añadir una página a la web por solo 60.000 $ COP! Ojo: las páginas adicionales no entran en el descuento «¡Ambos!»."
+          right={<Big amount="+60.000" unit="/página" />}
+          delay={0}
+        />
+
+        {/* «¡Ambos!» */}
+        <Band
+          className="price-card-ambos"
+          sigil={<Sigil d={SIGILS.knot} className="h-7 w-7" />}
+          title="«¡Ambos!»"
+          desc="Si pides 2 o más añadidos entre redacción e ilustración grande, todo lo adicional sale con descuento:"
+          delay={90}
+        >
+          <div className="mt-7 grid gap-4 sm:grid-cols-3">
+            {[
+              { old: "20.000", neo: "17.000", unit: "/párrafo", off: "−14,29%" },
+              { old: "30.000", neo: "25.000", unit: "/grande", off: "−12,5%" },
+              { old: "3000", neo: "1500", unit: "/dibujo", off: "−50%" },
+            ].map((r) => (
+              <div key={r.unit} className="border border-gold-500/25 bg-ink-900/70 p-5 transition-all duration-500 group-hover:border-gold-500/50">
+                <p className="font-digital text-[13px] text-parch-500 line-through decoration-red-400/70">{r.old} $ COP</p>
+                <p className="mt-1.5 font-digital text-[26px] leading-none text-mint-400">
+                  {r.neo} <span className="text-[12px] text-parch-400">$ COP{r.unit}</span>
+                </p>
+                <span className="mt-3.5 inline-block border border-mint-500/40 bg-mint-500/10 px-2 py-1 font-digital text-[10px] tracking-[0.12em] text-mint-300">
+                  {r.off}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Band>
+
+        {/* Garantía */}
+        <Band
+          sigil={<Sigil d={SIGILS.shield} className="h-7 w-7" />}
+          title="Garantía de cambios · 1 año"
+          tag="TRANQUILIDAD BARATA"
+          tone="mint"
+          desc="Por +50.000 $ COP, durante los 12 meses tras la entrega los cambios y retoques van incluidos. Siempre va incluída una garantía gratis de 1 mes."
+          right={<Big amount="+50.000" accent="text-mint-400" />}
+          delay={0}
+        />
+
+        {/* Corporativa */}
+        <Band
+          className="price-card-corp"
+          sigil={<Sigil d={SIGILS.tower} className="h-7 w-7" />}
+          title="¿Necesitas 5 páginas? Empieza por la corporativa"
+          tag="SALE MÁS BARATA"
+          desc="La web corporativa incluye 5 páginas por 390.000 $ COP. Haz cuentas: básica + 4 páginas adicionales serían 430.000 $ COP — te ahorras 40.000 $ COP."
+          right={
+            <div className="flex flex-wrap items-end gap-x-7 gap-y-2 lg:justify-end lg:text-right">
+              <Big amount="390.000" />
+              <div className="pb-1">
+                <p className="font-digital text-[10px] tracking-[0.14em] text-parch-500">AHORRO FRENTE A BÁSICA + 4 PÁGINAS</p>
+                <p className="mt-1 font-digital text-[20px] leading-none text-mint-400">−40.000 $ COP</p>
+              </div>
+            </div>
+          }
+          delay={90}
+        />
+
+        {/* + Páginas adicionales (corporativa) */}
+        <Band
+          sigil={<Sigil d={SIGILS.plus} className="h-7 w-7" />}
+          title="+ Páginas adicionales"
+          tag="NO ENTRA EN EL DESCUENTO «¡AMBOS!»"
+          tone="red"
+          desc="¡Puedes añadir una página a la web por solo esto! Cada página extra mantiene el mismo mimo que la primera. Eso sí: las páginas van siempre a tarifa, sin descuento «¡Ambos!»."
+          right={<Big amount="+60.000" note="POR PÁGINA" />}
+          delay={0}
+        />
+      </div>
+
+      <Calculator />
+    </section>
+  );
+}
+
+/* ============================================================
+   CALCULADORA DEL PACTO
+============================================================ */
 
 function Stepper({
   label,
@@ -336,21 +388,11 @@ function Calculator() {
   const [errores, setErrores] = useState<Errores>({});
   const [envio, setEnvio] = useState<EnvioStatus>("idle");
 
-  const ambos = redaccion + grande >= 2;
-
-  const calc = useMemo(() => {
-    const baseCost = base === "basica" ? P.basica : P.corp;
-    const rCost = redaccion * (ambos ? P.redaccionD : P.redaccion);
-    const gCost = grande * (ambos ? P.grandeD : P.grande);
-    const dCost = dibujo * (ambos ? P.dibujoD : P.dibujo);
-    const pCost = paginas * P.pagina;
-    const gar = garantia ? P.garantia : 0;
-    const subtotal = baseCost + rCost + gCost + dCost + pCost + gar;
-    const ahorro = ambos ? redaccion * (P.redaccion - P.redaccionD) + grande * (P.grande - P.grandeD) + dibujo * (P.dibujo - P.dibujoD) : 0;
-    const expressFee = pace === "express" ? Math.round(subtotal * 0.1) : 0;
-    const total = subtotal + expressFee;
-    return { baseCost, rCost, gCost, dCost, pCost, gar, subtotal, ahorro, expressFee, total };
-  }, [base, redaccion, grande, dibujo, paginas, garantia, pace, ambos]);
+  const calc = useMemo(
+    () => calcularPacto({ base, r: redaccion, g: grande, d: dibujo, p: paginas, w: garantia, v: pace }),
+    [base, redaccion, grande, dibujo, paginas, garantia, pace]
+  );
+  const ambos = calc.ambos;
 
   const paceData = PACES.find((p) => p.id === pace)!;
 
@@ -381,6 +423,16 @@ function Calculator() {
     "TOTAL DEL PACTO": `${fmt(calc.total)} $ COP`,
   };
 
+  /* enlace privado a la mesa de recibos, con todo el pacto codificado dentro */
+  const enlaceRecibo = useMemo(() => {
+    const cfg = { n: nombre.trim(), e: email.trim(), i: idea.trim(), b: base, r: redaccion, g: grande, d: dibujo, p: paginas, w: garantia, v: pace };
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+    return `${window.location.origin}${window.location.pathname}#/${RECIBO_HASH}?d=${b64}`;
+  }, [nombre, email, idea, base, redaccion, grande, dibujo, paginas, garantia, pace]);
+
   const enviar = async () => {
     const e: Errores = {};
     if (!nombre.trim()) e.nombre = "Falta tu nombre o cómo quieres que te llame.";
@@ -399,6 +451,7 @@ function Calculator() {
       "Su correo": email.trim(),
       "Descripción de la idea": idea.trim(),
       ...detalles,
+      "—— PARA TI: CREA EL RECIBO ——": enlaceRecibo,
     };
     try {
       const res = await fetch(`https://formsubmit.co/ajax/${DESTINO}`, {

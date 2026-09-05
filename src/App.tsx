@@ -1,9 +1,12 @@
+import { useEffect, useState } from "react";
 import { Ambient, Header, Marquee } from "./components/Chrome";
 import RuneText from "./components/RuneText";
 import LicuadoroCard from "./components/LicuadoroCard";
 import Poem from "./components/Poem";
 import { Process } from "./components/Sections";
 import { Ofrendas } from "./components/Pricing";
+import Recibo from "./components/Recibo";
+import { RECIBO_HASH } from "./data";
 import { useReducedMotion } from "./hooks";
 
 function ScrollHint() {
@@ -49,6 +52,24 @@ function Hero() {
 }
 
 export default function App() {
+  const [hash, setHash] = useState(() => window.location.hash);
+
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  // La mesa de recibos es privada: solo existe tras la runa secreta del enlace.
+  if (hash.startsWith(`#/${RECIBO_HASH}`)) {
+    return (
+      <div className="relative min-h-screen overflow-x-clip bg-ink-900 text-parch-200 selection:bg-gold-400/30 selection:text-parch-100">
+        <Ambient />
+        <Recibo />
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen overflow-x-clip bg-ink-900 text-parch-200 selection:bg-gold-400/30 selection:text-parch-100">
       <Ambient />
