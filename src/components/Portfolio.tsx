@@ -147,11 +147,8 @@ function Lamina({ ilus, i, onOpen }: { ilus: Ilustracion; i: number; onOpen: (id
         </span>
 
         <span className="flex items-center justify-between gap-3 px-1.5 pb-0.5 pt-3">
-          <span className="min-w-0">
-            <span className="block truncate font-display text-[14px] font-bold tracking-wide text-parch-100">{ilus.titulo}</span>
-            <span className="mt-0.5 block font-digital text-[8.5px] tracking-[0.26em] text-gold-500/90">
-              LÁMINA {ROMANOS[i % ROMANOS.length]} · HECHA A MANO
-            </span>
+          <span className="font-digital text-[8.5px] tracking-[0.26em] text-gold-500/90">
+            LÁMINA {ROMANOS[i % ROMANOS.length]} · HECHA A MANO
           </span>
           <span className="grid h-8 w-8 shrink-0 place-items-center border border-ink-600 text-gold-400 transition-all duration-500 group-hover:border-gold-400/70 group-hover:bg-gold-400/10">
             <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -205,7 +202,6 @@ function Lightbox({ idx, onClose, onNav }: { idx: number; onClose: () => void; o
         </div>
         <div className="mt-4 flex items-center justify-between gap-4">
           <p className="min-w-0">
-            <span className="block truncate font-display text-[15px] font-bold tracking-wide text-parch-100">{ilus.titulo}</span>
             <span className="font-digital text-[9px] tracking-[0.28em] text-gold-500">
               LÁMINA {ROMANOS[idx % ROMANOS.length]} DE {ROMANOS[ILUSTRACIONES.length - 1]}
             </span>
