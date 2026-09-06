@@ -51,6 +51,7 @@ function BotWhatsApp() {
   const [input, setInput] = useState("");
   const [test, setTest] = useState<"idle" | "sending" | "ok">("idle");
   const [flash, setFlash] = useState(false);
+  const [copiado, setCopiado] = useState(false);
 
   const efectiva = saved.trim() || CMB_KEY.trim();
 
@@ -100,14 +101,53 @@ function BotWhatsApp() {
         Para que los pactos por WhatsApp te lleguen solos a <span className="text-parch-200">{WA_DISPLAY}</span> (sin que el
         cliente abra ni envíe nada), activa el bot gratuito <span className="text-parch-200">CallMeBot</span> una sola vez:
       </p>
-      <ol className="mt-2.5 list-decimal space-y-1.5 pl-5 text-[12px] leading-relaxed text-parch-400">
-        <li>
-          Guarda en tus contactos el número del bot: <span className="font-digital text-[11px] text-mint-300">+34 644 51 95 23</span>
+      <ol className="mt-2.5 space-y-2 text-[12px] leading-relaxed text-parch-400">
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center border border-mint-500/40 font-digital text-[9px] text-mint-300">1</span>
+          <span>
+            En WhatsApp, crea un <span className="text-parch-200">contacto nuevo</span> con el número del bot:{" "}
+            <span className="font-digital text-[11px] text-mint-300">+34 644 95 42 75</span> (ponle el nombre que quieras).
+          </span>
         </li>
-        <li>
-          Escríbele por WhatsApp: <span className="font-digital text-[11px] text-parch-100">I allow callmebot to send me messages</span>
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center border border-mint-500/40 font-digital text-[9px] text-mint-300">2</span>
+          <span>
+            Ábrele el chat y envíale <span className="text-parch-200">exactamente</span> este mensaje:{" "}
+            <span className="inline-flex flex-wrap items-center gap-2 align-middle">
+              <code className="border border-ink-600 bg-ink-850 px-2 py-0.5 font-digital text-[10.5px] text-parch-100">
+                I allow callmebot to send me messages
+              </code>
+              <button
+                onClick={() => {
+                  navigator.clipboard?.writeText("I allow callmebot to send me messages").catch(() => undefined);
+                  setCopiado(true);
+                  window.setTimeout(() => setCopiado(false), 1600);
+                }}
+                className={`border px-2 py-0.5 font-digital text-[8.5px] tracking-[0.14em] transition-all duration-300 ${
+                  copiado
+                    ? "border-mint-400/70 bg-mint-500/15 text-mint-300"
+                    : "border-ink-600 text-parch-400 hover:border-mint-500/60 hover:text-mint-300"
+                }`}
+              >
+                {copiado ? "¡COPIADO!" : "COPIAR"}
+              </button>
+            </span>
+          </span>
         </li>
-        <li>Te responderá con una llave (apikey). Cópiala y pégala aquí abajo.</li>
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center border border-mint-500/40 font-digital text-[9px] text-mint-300">3</span>
+          <span>
+            En unos segundos te responderá algo como{" "}
+            <span className="font-digital text-[10.5px] text-parch-100">"API Activated... Your APIKEY is 123123"</span>. Esos
+            números del final <span className="text-parch-200">son tu llave</span>: cópialos y pégalos aquí abajo.
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center border border-ink-600 font-digital text-[9px] text-parch-500">!</span>
+          <span className="text-parch-500">
+            ¿No te responde en 2 minutos? Según la página oficial del bot, espera 24 horas e inténtalo de nuevo.
+          </span>
+        </li>
       </ol>
 
       <div className="mt-3.5 flex items-stretch gap-2">
