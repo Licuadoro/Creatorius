@@ -18,26 +18,32 @@ const SIGILS: Record<string, ReactNode> = {
       <path d="M35 7l1.6 3.4L40 12l-3.4 1.6L35 17l-1.6-3.4L30 12l3.4-1.6z" />
     </Sigil>
   ),
-  pacto: (
+  trazo: (
     <Sigil>
-      <path d="M18 14l10 10-10 10-10-10z" />
-      <path d="M30 14l10 10-10 10-10-10" />
-      <circle cx="24" cy="24" r="2.2" fill="currentColor" stroke="none" />
+      <circle cx="24" cy="9" r="3" />
+      <path d="M24 12l-9 22" />
+      <path d="M24 12l9 22" />
+      <path d="M15 34q9-6 18 0" />
     </Sigil>
   ),
-  forja: (
+  elementos: (
     <Sigil>
-      <path d="M13 35L25 23" />
-      <path d="M22 11l9 9-6 6-9-9z" />
-      <path d="M31 20l4 4" />
-      <path d="M36 10l2 2M40 16l2 2M38 8l1.5 4" />
-      <path d="M9 39h8" />
+      <path d="M26 10l8 8-13 13c-2.5 2.5-6 2.5-8 0s-2.5-5.5 0-8z" />
+      <path d="M34 18l3-3" />
+      <path d="M13 35c2 1.5 4 1.5 6 0" />
+      <path d="M38 8l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" />
     </Sigil>
   ),
   entrega: (
     <Sigil>
       <circle cx="33" cy="15" r="5.5" />
       <path d="M8 20l13-4M6 29l15-5M10 38l13-6" />
+    </Sigil>
+  ),
+  vitrina: (
+    <Sigil>
+      <rect x="9" y="9" width="30" height="30" />
+      <path d="M24 16.5l2.3 4.7 5.2.8-3.75 3.65.9 5.15L24 28.4l-4.65 2.45.9-5.15L16.5 22l5.2-.8z" />
     </Sigil>
   ),
 };
@@ -48,26 +54,32 @@ const STEPS = [
   {
     sigil: "invoca",
     num: "I",
-    title: "Invocación",
-    text: "Me cuentas tu idea tal como vive en tu cabeza: caótica, brillante, imposible. Yo escucho, pregunto y traduzco ese caos a un plano.",
+    title: "Evocación",
+    text: "Tú rellenas el formulario, y materializas tu idea en tu mente mientras lo sueltas en el teclado. A mi me llega a mi correo todo lo que pediste, te responderé cuestionándote las dudas que tenga, y hablaremos sobre tu idea.",
   },
   {
-    sigil: "pacto",
+    sigil: "trazo",
     num: "II",
-    title: "El pacto",
-    text: "Acordamos alcance, plazos y precio. Todo negociable, nada de letra pequeña: el trato se cierra mirándose a los ojos.",
+    title: "Comienzo",
+    text: "Tras haber pagado, yo comienzo a crear los trazos sobre los planos, hago la web funcional, te comparto actualizaciones, y me puedes pedir cambios.",
   },
   {
-    sigil: "forja",
+    sigil: "elementos",
     num: "III",
-    title: "La forja",
-    text: "Diseño, código, textos e ilustración si hace falta. Ves el mundo tomar forma con avances constantes, no con silencios.",
+    title: "Los elementos",
+    text: "Me pondré a ilustrar y redactar todos los elementos que me hayas pedido, y añadiré todos los detalles finales hasta terminar la web.",
   },
   {
     sigil: "entrega",
     num: "IV",
-    title: "La entrega",
-    text: "Tu web despierta en internet, viva y afinada. Y si algo chirría, vuelvo a la forja sin dramas ni facturas sorpresa.",
+    title: "Entrega de llaves",
+    text: "Te envío el código, te enseño a publicar tu web y te muestro cómo usar la web.",
+  },
+  {
+    sigil: "vitrina",
+    num: "V",
+    title: "La vitrina",
+    text: "Me compartes el enlace de tu web, y yo lo pondré en mi portafolio. Así la gente que entre aquí podrá acceder a tu web para que la conozcan, y yo me gano reputación. Si crees que me lo merezco, déja un buen comentario y una puntuación de 0 a 5 estrellas, y yo lo exhibiré con orgullo en mi portafolio.",
   },
 ];
 
@@ -81,7 +93,7 @@ export function Process() {
             De la chispa al <span className="text-gold-400">mundo vivo</span>
           </>
         }
-        accent="Cuatro pasos, ningún misterio. Así se convierte una idea que solo existe en tu cabeza en una web que existe en todas las pantallas."
+        accent="Cinco pasos, ningún misterio. Así se convierte una idea que solo existe en tu cabeza en una web que existe en todas las pantallas."
       />
 
       <div className="relative">
