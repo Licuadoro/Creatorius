@@ -55,8 +55,16 @@ export const HEADLINE_LINES = [
   "antes de lo que esperas.",
 ];
 
-export const ANCIENT_MEANING =
-  "Creo tu idea con el detalle de un dios creando un mundo. ...¿Acaso no lo soy?";
+/**
+ * La inscripción que las runas significan de verdad.
+ * Cada runa del titular adopta su forma de la letra correspondiente de esta
+ * frase (runa 1 → "C", runa 2 → "o", runa 3 → "n"…), así que el conjuro que
+ * ves en pantalla está deletreando en secreto estas palabras.
+ */
+export const HIDDEN_SENTENCE =
+  "Construyó tú idea con el nivel de detalle de un dios creando un mundo. ...¿Acaso no lo soy?";
+
+export const ANCIENT_MEANING = HIDDEN_SENTENCE;
 
 export const LICUADO_URL = "https://licuado.licuado.workers.dev";
 
