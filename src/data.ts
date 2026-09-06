@@ -76,6 +76,13 @@ export const WA_DESTINO = "34631427597";
  */
 export const CMB_KEY = "";
 
+/* Número del forjador al que el bot entrega los pactos (solo dígitos, con prefijo de país). */
+export const WA_NUM = "34631427597";
+export const WA_DISPLAY = "+34 631 42 75 97";
+
+/* Dónde guarda la mesa de recibos la llave del bot en este navegador. */
+export const CMB_LS_KEY = "creatorius:cmb";
+
 export const LICUADORO_PHOTO =
   "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbwhRnXPvUxggOGE4t5RFCC0CLWuAj7shFk4dxvgB0PHMjSg5dw-lVElDkyEGh0gN6PiFT_uDTPxnYS-j9gJcmmlmBR8FM9ohUgXRA4gHWcPNejaHUk9W3LW440ZMsBOFVS2LBsIpms5YmdnPIEUpG0YI8-EsoKxyay7XrckorCDjCbztBfDW0o3eHAss/s1600/1000068010.png";
 

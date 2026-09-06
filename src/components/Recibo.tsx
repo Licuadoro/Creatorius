@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import RuneGlyph from "./RuneGlyph";
-import { RECIBO_HASH } from "../data";
+import { CMB_KEY, CMB_LS_KEY, RECIBO_HASH, WA_DISPLAY, WA_NUM } from "../data";
 import { P, MAX, PACES, calcularPacto, fmt, type PaceId, type PactoCfg } from "./Pricing";
 
 type DatosCliente = { n: string; e: string; wa: string; i: string };
@@ -39,6 +39,112 @@ function leerHash(): { valido: boolean; datos: (PactoCfg & DatosCliente) | null 
 const DEFAULT_CFG: PactoCfg = { base: "basica", r: 0, g: 0, d: 0, p: 0, w: false, v: "sin" };
 
 const LS_CUENTA = "creatorius:cuenta";
+
+/**
+ * Panel privado para configurar el bot de WhatsApp (CallMeBot).
+ * Solo se muestra en la mesa de recibos, que ya es una página de acceso privado.
+ */
+function BotWhatsApp() {
+  const [saved, setSaved] = useState<string>(() => {
+    try { return localStorage.getItem(CMB_LS_KEY) ?? ""; } catch { return ""; }
+  });
+  const [input, setInput] = useState("");
+  const [test, setTest] = useState<"idle" | "sending" | "ok">("idle");
+  const [flash, setFlash] = useState(false);
+
+  const efectiva = saved.trim() || CMB_KEY.trim();
+
+  const guardar = () => {
+    const v = input.trim();
+    try {
+      if (v) localStorage.setItem(CMB_LS_KEY, v);
+      else localStorage.removeItem(CMB_LS_KEY);
+    } catch { /* sin almacenamiento */ }
+    setSaved(v);
+    setInput("");
+    setFlash(true);
+    window.setTimeout(() => setFlash(false), 2600);
+  };
+
+  const borrar = () => {
+    try { localStorage.removeItem(CMB_LS_KEY); } catch { /* sin almacenamiento */ }
+    setSaved("");
+  };
+
+  const probar = () => {
+    const key = input.trim() || efectiva;
+    if (!key) return;
+    setTest("sending");
+    const img = new Image();
+    img.src = `https://api.callmebot.com/whatsapp.php?phone=${WA_NUM}&text=${encodeURIComponent(
+      "Prueba de Creatorius: el bot de WhatsApp funciona. Los pactos te llegarán por aquí."
+    )}&apikey=${encodeURIComponent(key)}`;
+    window.setTimeout(() => setTest("ok"), 1500);
+  };
+
+  return (
+    <div className="border border-mint-500/30 bg-mint-500/[0.03] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-digital text-[10px] tracking-[0.24em] text-mint-300">04 · BOT DE WHATSAPP (SOLO PARA TI)</p>
+        <span
+          className={`flex items-center gap-1.5 border px-2 py-1 font-digital text-[9px] tracking-[0.14em] transition-colors duration-300 ${
+            efectiva ? "border-mint-500/50 bg-mint-500/[0.08] text-mint-300" : "border-ink-600 text-parch-500"
+          }`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${efectiva ? "bg-mint-400" : "bg-parch-600"}`} />
+          {efectiva ? "BOT ACTIVO" : "SIN LLAVE"}
+        </span>
+      </div>
+
+      <p className="mt-3 text-[12px] leading-relaxed text-parch-400">
+        Para que los pactos por WhatsApp te lleguen solos a <span className="text-parch-200">{WA_DISPLAY}</span> (sin que el
+        cliente abra ni envíe nada), activa el bot gratuito <span className="text-parch-200">CallMeBot</span> una sola vez:
+      </p>
+      <ol className="mt-2.5 list-decimal space-y-1.5 pl-5 text-[12px] leading-relaxed text-parch-400">
+        <li>
+          Guarda en tus contactos el número del bot: <span className="font-digital text-[11px] text-mint-300">+34 644 51 95 23</span>
+        </li>
+        <li>
+          Escríbele por WhatsApp: <span className="font-digital text-[11px] text-parch-100">I allow callmebot to send me messages</span>
+        </li>
+        <li>Te responderá con una llave (apikey). Cópiala y pégala aquí abajo.</li>
+      </ol>
+
+      <div className="mt-3.5 flex items-stretch gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={efectiva ? `Llave actual: ····${efectiva.slice(-4)}` : "Pega aquí tu apikey de CallMeBot"}
+          className="pacto-input flex-1 font-digital text-[12px]"
+        />
+        <button
+          onClick={guardar}
+          className="shrink-0 border border-mint-500/50 bg-mint-500/[0.08] px-3.5 font-digital text-[9px] tracking-[0.16em] text-mint-300 transition-all duration-300 hover:bg-mint-500/20"
+        >
+          {flash ? "¡GUARDADA!" : "GUARDAR"}
+        </button>
+        <button
+          onClick={probar}
+          disabled={!input.trim() && !efectiva}
+          className="shrink-0 border border-ink-600 bg-ink-850/80 px-3.5 font-digital text-[9px] tracking-[0.16em] text-parch-300 transition-all duration-300 enabled:hover:border-mint-500/60 enabled:hover:text-mint-300 disabled:opacity-40"
+        >
+          {test === "sending" ? "ENVIANDO…" : test === "ok" ? "MIRA TU WHATSAPP" : "PROBAR"}
+        </button>
+      </div>
+      <div className="mt-2.5 flex items-center justify-between gap-3">
+        <p className="font-digital text-[8.5px] leading-relaxed tracking-[0.1em] text-parch-600">
+          SE GUARDA EN ESTE NAVEGADOR · PARA TODOS LOS VISITANTES, PÉGALA TAMBIÉN EN src/data.ts → CMB_KEY
+        </p>
+        {saved && (
+          <button onClick={borrar} className="link-underline shrink-0 font-digital text-[8.5px] tracking-[0.16em] text-red-300/80 transition-colors hover:text-red-300">
+            QUITAR LLAVE
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function MiniStepper({ label, value, max, onChange }: { label: string; value: number; max: number; onChange: (v: number) => void }) {
   return (
@@ -286,6 +392,8 @@ export default function Recibo() {
             />
             <p className="mt-2 font-digital text-[9px] tracking-[0.16em] text-parch-600">SE GUARDA EN ESTE NAVEGADOR PARA PRÓXIMOS RECIBOS</p>
           </div>
+
+          <BotWhatsApp />
 
           <button
             onClick={exportar}

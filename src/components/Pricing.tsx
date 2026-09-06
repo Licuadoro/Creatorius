@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Reveal, SectionHeading } from "./Chrome";
-import { CMB_KEY, LICUADO_URL, RECIBO_HASH } from "../data";
+import { CMB_KEY, CMB_LS_KEY, LICUADO_URL, RECIBO_HASH, WA_DISPLAY, WA_NUM } from "../data";
 import { Money, useCurrency } from "../currency";
 
 /* ============================================================
@@ -394,8 +394,6 @@ function Stepper({
 }
 
 const DESTINO = "licuadorodelicuado@gmail.com";
-const WA_NUM = "34631427597";
-const WA_DISPLAY = "+34 631 42 75 97";
 
 type EnvioStatus = "idle" | "sending" | "sent" | "fallback";
 type Errores = { canal?: string; nombre?: string; contacto?: string; idea?: string };
@@ -562,13 +560,22 @@ function Calculator() {
 
   /* Canal B: lo entrega el bot de WhatsApp (sin que el cliente inicie sesión en nada). */
   const enviarWhatsApp = async () => {
-    if (CMB_KEY.trim()) {
+    // La llave puede venir del navegador (configurada en la mesa de recibos) o del código.
+    let key = "";
+    try {
+      key = (localStorage.getItem(CMB_LS_KEY) ?? "").trim();
+    } catch {
+      /* sin almacenamiento */
+    }
+    if (!key) key = CMB_KEY.trim();
+
+    if (key) {
       setVia("whatsapp-bot");
       setEnvio("sending");
       // El bot se llama con un GET; la respuesta no se lee, así que CORS no importa.
       const url = `https://api.callmebot.com/whatsapp.php?phone=${WA_NUM}&text=${encodeURIComponent(
         textoWhatsApp
-      )}&apikey=${CMB_KEY.trim()}`;
+      )}&apikey=${encodeURIComponent(key)}`;
       const img = new Image();
       img.src = url;
       // CallMeBot responde al instante; damos margen y marcamos enviado.
