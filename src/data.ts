@@ -63,36 +63,6 @@ export const LICUADO_URL = "https://licuado.licuado.workers.dev";
 /** Ruta secreta de la mesa de recibos: solo se llega mediante el enlace que viaja en el formulario. */
 export const RECIBO_HASH = "sello-x9q42";
 
-/**
- * EL REPETIDOR (recomendado): un Worker de Cloudflare que guarda las llaves
- * ocultas y entrega los pactos por 360dialog, Twilio o CallMeBot.
- * El código está en worker-relay/creatorius-relay.js con los pasos.
- * Cuando lo despliegues, pega aquí su URL y el secreto que le inventes
- * (o guárdalos desde la mesa de recibos, panel «EL REPETIDOR»).
- */
-export const RELAY_URL = "";
-export const RELAY_SECRET = "";
-export const RELAY_LS_URL = "creatorius:relay";
-export const RELAY_LS_SECRET = "creatorius:relay-secret";
-
-/**
- * Llave del bot CallMeBot (canal directo, opcional).
- * Cómo sacarla (una sola vez):
- *   1. Guarda en tus contactos el número oficial del bot: +34 644 95 42 75
- *   2. Envíale por WhatsApp: "I allow callmebot to send me messages"
- *   3. El bot te responde con tu llave (apikey). Pégala aquí entre las comillas.
- *   (Si no responde en 2 minutos, su web oficial dice que se reintente a las 24 h.)
- * Si está vacía y no hay repetidor, el pacto se abre en el WhatsApp del cliente ya escrito.
- */
-export const CMB_KEY = "";
-
-/* Número del forjador al que el bot entrega los pactos (solo dígitos, con prefijo de país). */
-export const WA_NUM = "34631427597";
-export const WA_DISPLAY = "+34 631 42 75 97";
-
-/* Dónde guarda la mesa de recibos la llave del bot en este navegador. */
-export const CMB_LS_KEY = "creatorius:cmb";
-
 export const LICUADORO_PHOTO =
   "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbwhRnXPvUxggOGE4t5RFCC0CLWuAj7shFk4dxvgB0PHMjSg5dw-lVElDkyEGh0gN6PiFT_uDTPxnYS-j9gJcmmlmBR8FM9ohUgXRA4gHWcPNejaHUk9W3LW440ZMsBOFVS2LBsIpms5YmdnPIEUpG0YI8-EsoKxyay7XrckorCDjCbztBfDW0o3eHAss/s1600/1000068010.png";
 
