@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Reveal, SectionHeading } from "./Chrome";
-import { LICUADO_URL, RECIBO_HASH } from "../data";
+import { CMB_KEY, LICUADO_URL, RECIBO_HASH } from "../data";
 import { Money, useCurrency } from "../currency";
 
 /* ============================================================
@@ -397,8 +397,16 @@ const DESTINO = "licuadorodelicuado@gmail.com";
 const WA_NUM = "34631427597";
 const WA_DISPLAY = "+34 631 42 75 97";
 
-type EnvioStatus = "idle" | "canal" | "sending" | "sent" | "fallback";
-type Errores = { nombre?: string; email?: string; idea?: string };
+type EnvioStatus = "idle" | "sending" | "sent" | "fallback";
+type Errores = { canal?: string; nombre?: string; contacto?: string; idea?: string };
+type Canal = "whatsapp" | "correo";
+/** whatsapp-bot: lo entrega el bot · whatsapp-manual: se abre WhatsApp con el mensaje escrito */
+type Via = "correo" | "whatsapp-bot" | "whatsapp-manual";
+
+const waValido = (v: string) => {
+  const digitos = (v.match(/\d/g) ?? []).length;
+  return /^\+?[\d\s().-]{7,19}$/.test(v.trim()) && digitos >= 7 && digitos <= 15;
+};
 
 function Calculator() {
   const { formatMoney, code } = useCurrency();
@@ -411,12 +419,13 @@ function Calculator() {
   const [pace, setPace] = useState<PaceId>("sin");
 
   /* ---- sello del pacto: datos del cliente ---- */
+  const [canal, setCanal] = useState<Canal | null>(null);
   const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
+  const [contacto, setContacto] = useState("");
   const [idea, setIdea] = useState("");
   const [errores, setErrores] = useState<Errores>({});
   const [envio, setEnvio] = useState<EnvioStatus>("idle");
-  const [via, setVia] = useState<"correo" | "whatsapp">("correo");
+  const [via, setVia] = useState<Via>("correo");
 
   const calc = useMemo(
     () => calcularPacto({ base, r: redaccion, g: grande, d: dibujo, p: paginas, w: garantia, v: pace }),
@@ -455,23 +464,57 @@ function Calculator() {
 
   /* enlace privado a la mesa de recibos, con todo el pacto codificado dentro */
   const enlaceRecibo = useMemo(() => {
-    const cfg = { n: nombre.trim(), e: email.trim(), i: idea.trim(), b: base, r: redaccion, g: grande, d: dibujo, p: paginas, w: garantia, v: pace };
+    const cfg = {
+      n: nombre.trim(),
+      e: canal === "correo" ? contacto.trim() : "",
+      wa: canal === "whatsapp" ? contacto.trim() : "",
+      i: idea.trim(),
+      b: base, r: redaccion, g: grande, d: dibujo, p: paginas, w: garantia, v: pace,
+    };
     const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))))
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/, "");
     return `${window.location.origin}${window.location.pathname}#/${RECIBO_HASH}?d=${b64}`;
-  }, [nombre, email, idea, base, redaccion, grande, dibujo, paginas, garantia, pace]);
+  }, [nombre, contacto, canal, idea, base, redaccion, grande, dibujo, paginas, garantia, pace]);
 
-  /* Paso 1: validar y pedir el canal (correo o WhatsApp). */
+  const contactoLabel = canal === "whatsapp" ? "WhatsApp" : "Correo";
+
+  /* El cuerpo del mensaje que viaja por WhatsApp (bot o manual). */
+  const textoWhatsApp = useMemo(
+    () =>
+      [
+        `*Nuevo pacto en Creatorius* — ${nombre.trim() || "(sin nombre)"}`,
+        "",
+        `*Nombre:* ${nombre.trim()}`,
+        `*${contactoLabel}:* ${contacto.trim()}`,
+        "",
+        "*Descripción de la idea:*",
+        idea.trim(),
+        "",
+        "*— Elementos del pacto —*",
+        ...Object.entries(detalles).map(([k, v]) => `*${k}:* ${v}`),
+        "",
+        "*—— PARA TI: CREA EL RECIBO ——*",
+        enlaceRecibo,
+      ].join("\n"),
+    [nombre, contacto, contactoLabel, idea, detalles, enlaceRecibo]
+  );
+
+  /* Validar según el canal elegido y despachar. */
   const enviar = () => {
     const e: Errores = {};
+    if (!canal) e.canal = "Elige por dónde quieres que te responda.";
     if (!nombre.trim()) e.nombre = "Falta tu nombre o cómo quieres que te llame.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) e.email = "Escribe un correo válido para poder responderte.";
+    if (canal === "correo" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contacto.trim()))
+      e.contacto = "Escribe un correo válido para poder responderte.";
+    if (canal === "whatsapp" && !waValido(contacto))
+      e.contacto = "Escribe un número de WhatsApp válido (mínimo 7 dígitos).";
     if (idea.trim().length < 10) e.idea = "Cuéntame un poco más de tu idea (unas 10 letras al menos).";
     setErrores(e);
-    if (e.nombre || e.email || e.idea) return;
-    setEnvio("canal");
+    if (e.canal || e.nombre || e.contacto || e.idea) return;
+    if (canal === "correo") void enviarCorreo();
+    else void enviarWhatsApp();
   };
 
   /* Canal A: correo hacia la bandeja del forjador. */
@@ -484,7 +527,7 @@ function Calculator() {
       _template: "table",
       _captcha: "false",
       Nombre: nombre.trim(),
-      "Su correo": email.trim(),
+      "Su correo": contacto.trim(),
       "Descripción de la idea": idea.trim(),
       ...detalles,
       "—— PARA TI: CREA EL RECIBO ——": enlaceRecibo,
@@ -501,7 +544,7 @@ function Calculator() {
       // respaldo: componer el correo en el gestor del visitante
       const cuerpo = [
         `Nombre: ${nombre.trim()}`,
-        `Correo: ${email.trim()}`,
+        `Correo: ${contacto.trim()}`,
         "",
         "Descripción de la idea:",
         idea.trim(),
@@ -517,26 +560,25 @@ function Calculator() {
     }
   };
 
-  /* Canal B: WhatsApp con el mensaje ya escrito. */
-  const enviarWhatsApp = () => {
-    setVia("whatsapp");
-    const texto = [
-      `*Nuevo pacto en Creatorius* — ${nombre.trim()}`,
-      "",
-      `*Nombre:* ${nombre.trim()}`,
-      `*Correo:* ${email.trim()}`,
-      "",
-      "*Descripción de la idea:*",
-      idea.trim(),
-      "",
-      "*— Elementos del pacto —*",
-      ...Object.entries(detalles).map(([k, v]) => `*${k}:* ${v}`),
-      "",
-      "*—— PARA TI: CREA EL RECIBO ——*",
-      enlaceRecibo,
-    ].join("\n");
-    window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
-    setEnvio("sent");
+  /* Canal B: lo entrega el bot de WhatsApp (sin que el cliente inicie sesión en nada). */
+  const enviarWhatsApp = async () => {
+    if (CMB_KEY.trim()) {
+      setVia("whatsapp-bot");
+      setEnvio("sending");
+      // El bot se llama con un GET; la respuesta no se lee, así que CORS no importa.
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${WA_NUM}&text=${encodeURIComponent(
+        textoWhatsApp
+      )}&apikey=${CMB_KEY.trim()}`;
+      const img = new Image();
+      img.src = url;
+      // CallMeBot responde al instante; damos margen y marcamos enviado.
+      window.setTimeout(() => setEnvio("sent"), 900);
+    } else {
+      // Sin llave configurada: se abre WhatsApp del cliente con el mensaje ya escrito.
+      setVia("whatsapp-manual");
+      window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(textoWhatsApp)}`, "_blank", "noopener");
+      setEnvio("sent");
+    }
   };
 
   return (
@@ -725,7 +767,44 @@ function Calculator() {
               <div className="mt-6 border-t border-ink-700 pt-5">
                 <p className="font-digital text-[10px] tracking-[0.26em] text-gold-500">TU PARTE DEL PACTO</p>
 
-                <label className="mt-4 block">
+                {/* canal por donde respondo */}
+                <p className="mt-4 font-digital text-[9px] tracking-[0.18em] text-parch-500">¿POR DÓNDE TE RESPONDO?</p>
+                <div className="mt-2 grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setCanal("whatsapp")}
+                    aria-pressed={canal === "whatsapp"}
+                    className={`flex items-center justify-center gap-2 border px-2 py-3 font-digital text-[10px] tracking-[0.14em] transition-all duration-300 active:scale-[0.97] ${
+                      canal === "whatsapp"
+                        ? "border-mint-400 bg-mint-500/[0.12] text-mint-300 shadow-[0_0_24px_-8px_rgba(94,234,212,0.5)]"
+                        : "border-ink-600 bg-ink-850/80 text-parch-500 hover:border-mint-500/50"
+                    }`}
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.5-.3-2.5.7.7-2.4-.3-.5A8 8 0 0 1 12 4Zm-3 4.2c-.3 0-.5.1-.7.4-.2.3-.9 1-.9 2.3s1 2.6 1.1 2.8c.1.2 1.9 3 4.6 4.1 2.3.9 2.8.7 3.3.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3l-1.8-.9c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-2.4-1.5c-.6-.6-1-1.3-1.2-1.6-.1-.2 0-.3.1-.5l.4-.5c.1-.1.2-.3.1-.5l-.8-1.9c-.2-.4-.4-.4-.7-.4Z" />
+                    </svg>
+                    WHATSAPP
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCanal("correo")}
+                    aria-pressed={canal === "correo"}
+                    className={`flex items-center justify-center gap-2 border px-2 py-3 font-digital text-[10px] tracking-[0.14em] transition-all duration-300 active:scale-[0.97] ${
+                      canal === "correo"
+                        ? "border-gold-400 bg-gold-500/[0.12] text-gold-300 shadow-[0_0_24px_-8px_rgba(227,179,65,0.5)]"
+                        : "border-ink-600 bg-ink-850/80 text-parch-500 hover:border-gold-500/50"
+                    }`}
+                  >
+                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="2.5" y="4" width="15" height="11.5" />
+                      <path d="m3 5 7 6 7-6" />
+                    </svg>
+                    CORREO
+                  </button>
+                </div>
+                {errores.canal && <span className="campo-err">{errores.canal}</span>}
+
+                <label className="mt-3.5 block">
                   <span className="font-digital text-[9px] tracking-[0.18em] text-parch-500">
                     TU NOMBRE O CÓMO QUIERES QUE TE LLAME
                   </span>
@@ -740,19 +819,20 @@ function Calculator() {
                   {errores.nombre && <span className="campo-err">{errores.nombre}</span>}
                 </label>
 
+                {/* contacto: cambia según el canal elegido */}
                 <label className="mt-3.5 block">
                   <span className="font-digital text-[9px] tracking-[0.18em] text-parch-500">
-                    TU CORREO PARA RESPONDERTE
+                    {canal === "whatsapp" ? "TU NÚMERO DE WHATSAPP" : "TU CORREO PARA RESPONDERTE"}
                   </span>
                   <input
-                    type="email"
-                    value={email}
+                    type={canal === "whatsapp" ? "tel" : "email"}
+                    value={contacto}
                     maxLength={80}
-                    onChange={(ev) => setEmail(ev.target.value)}
-                    placeholder="tucorreo@ejemplo.com"
-                    className={`pacto-input mt-1.5 ${errores.email ? "err" : ""}`}
+                    onChange={(ev) => setContacto(ev.target.value)}
+                    placeholder={canal === "whatsapp" ? "+57 300 123 4567" : "tucorreo@ejemplo.com"}
+                    className={`pacto-input mt-1.5 ${errores.contacto ? "err" : ""}`}
                   />
-                  {errores.email && <span className="campo-err">{errores.email}</span>}
+                  {errores.contacto && <span className="campo-err">{errores.contacto}</span>}
                 </label>
 
                 <label className="mt-3.5 block">
@@ -776,7 +856,12 @@ function Calculator() {
                 <div className="mt-6 border border-mint-500/50 bg-mint-500/[0.08] px-5 py-4 text-center">
                   <p className="font-display text-[15px] font-bold tracking-wide text-mint-300">¡PACTO SELLADO!</p>
                   <p className="mt-1.5 text-[12.5px] leading-relaxed text-parch-300/90">
-                    {via === "whatsapp" ? (
+                    {via === "whatsapp-bot" ? (
+                      <>
+                        El bot ya llevó tu pacto por WhatsApp al <span className="text-mint-300">{WA_DISPLAY}</span>.
+                        Te responderé a tu número muy pronto.
+                      </>
+                    ) : via === "whatsapp-manual" ? (
                       <>
                         Tu pacto salió por WhatsApp hacia el <span className="text-mint-300">{WA_DISPLAY}</span>.
                         Solo queda pulsar enviar en la conversación que se abrió.
@@ -787,54 +872,21 @@ function Calculator() {
                       </>
                     )}
                   </p>
+                  {via === "whatsapp-bot" && (
+                    <a
+                      href={`https://wa.me/${WA_NUM}?text=${encodeURIComponent(textoWhatsApp)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="link-underline mt-2 block font-digital text-[9px] tracking-[0.16em] text-parch-500 transition-colors hover:text-mint-300"
+                    >
+                      ¿NO LLEGÓ? ÁBRELO EN WHATSAPP
+                    </a>
+                  )}
                   <button
-                    onClick={() => { setEnvio("idle"); setVia("correo"); setNombre(""); setEmail(""); setIdea(""); setErrores({}); }}
+                    onClick={() => { setEnvio("idle"); setVia("correo"); setCanal(null); setNombre(""); setContacto(""); setIdea(""); setErrores({}); }}
                     className="link-underline mt-3 font-digital text-[10px] tracking-[0.18em] text-mint-400"
                   >
                     FORJAR OTRO PACTO
-                  </button>
-                </div>
-              ) : envio === "canal" ? (
-                <div className="menu-pop mt-6 border border-gold-600/45 bg-ink-900/85 p-5">
-                  <p className="text-center font-display text-[15px] font-bold tracking-[0.12em] text-parch-100">
-                    ¿POR DÓNDE SELLAMOS EL PACTO?
-                  </p>
-                  <p className="mt-1.5 text-center font-digital text-[9px] tracking-[0.2em] text-parch-500">
-                    ELIGE EL CANAL — EL MENSAJE SALE YA ESCRITO
-                  </p>
-
-                  <div className="mt-5 grid grid-cols-2 gap-3">
-                    {/* WhatsApp */}
-                    <button
-                      onClick={enviarWhatsApp}
-                      className="group flex flex-col items-center gap-2.5 border border-mint-500/45 bg-mint-500/[0.05] px-3 py-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-mint-400 hover:bg-mint-500/[0.13] hover:shadow-[0_0_34px_-8px_rgba(94,234,212,0.55)] active:scale-[0.97]"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-8 w-8 text-mint-300 transition-transform duration-300 group-hover:scale-110" fill="currentColor" aria-hidden="true">
-                        <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 1 1-4.2 14.8l-.5-.3-2.5.7.7-2.4-.3-.5A8 8 0 0 1 12 4Zm-3 4.2c-.3 0-.5.1-.7.4-.2.3-.9 1-.9 2.3s1 2.6 1.1 2.8c.1.2 1.9 3 4.6 4.1 2.3.9 2.8.7 3.3.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3l-1.8-.9c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-2.4-1.5c-.6-.6-1-1.3-1.2-1.6-.1-.2 0-.3.1-.5l.4-.5c.1-.1.2-.3.1-.5l-.8-1.9c-.2-.4-.4-.4-.7-.4Z" />
-                      </svg>
-                      <span className="font-digital text-[11px] tracking-[0.18em] text-mint-300">VÍA WHATSAPP</span>
-                      <span className="font-digital text-[8.5px] tracking-[0.12em] text-parch-500">{WA_DISPLAY}</span>
-                    </button>
-
-                    {/* Correo */}
-                    <button
-                      onClick={enviarCorreo}
-                      className="group flex flex-col items-center gap-2.5 border border-gold-500/45 bg-gold-500/[0.05] px-3 py-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-gold-400 hover:bg-gold-500/[0.11] hover:shadow-[0_0_34px_-8px_rgba(227,179,65,0.5)] active:scale-[0.97]"
-                    >
-                      <svg viewBox="0 0 20 20" className="h-8 w-8 text-gold-300 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <rect x="2.5" y="4" width="15" height="11.5" />
-                        <path d="m3 5 7 6 7-6" />
-                      </svg>
-                      <span className="font-digital text-[11px] tracking-[0.18em] text-gold-300">VÍA CORREO</span>
-                      <span className="max-w-full truncate px-1 font-digital text-[8.5px] tracking-[0.08em] text-parch-500">{DESTINO}</span>
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => setEnvio("idle")}
-                    className="link-underline mt-4 w-full text-center font-digital text-[9px] tracking-[0.22em] text-parch-500 transition-colors hover:text-parch-300"
-                  >
-                    VOLVER AL PERGAMINO
                   </button>
                 </div>
               ) : envio === "fallback" ? (
@@ -854,7 +906,11 @@ function Calculator() {
                 <button
                   onClick={enviar}
                   disabled={envio === "sending"}
-                  className="group mt-6 flex w-full items-center justify-center gap-3 bg-gold-400 px-5 py-3.5 font-digital text-[11px] tracking-[0.2em] text-ink-900 transition-all duration-300 enabled:hover:shadow-[0_0_36px_rgba(227,179,65,0.45)] enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:opacity-70"
+                  className={`group mt-6 flex w-full items-center justify-center gap-3 px-5 py-3.5 font-digital text-[11px] tracking-[0.2em] transition-all duration-300 enabled:active:scale-[0.98] disabled:opacity-70 ${
+                    canal === "whatsapp"
+                      ? "bg-mint-400 text-ink-900 enabled:hover:shadow-[0_0_36px_rgba(94,234,212,0.5)] enabled:hover:brightness-110"
+                      : "bg-gold-400 text-ink-900 enabled:hover:shadow-[0_0_36px_rgba(227,179,65,0.45)] enabled:hover:brightness-110"
+                  }`}
                 >
                   {envio === "sending" ? (
                     <>
@@ -865,7 +921,7 @@ function Calculator() {
                     </>
                   ) : (
                     <>
-                      CERRAR EL PACTO
+                      {canal === "whatsapp" ? "CERRAR EL PACTO POR WHATSAPP" : canal === "correo" ? "CERRAR EL PACTO POR CORREO" : "CERRAR EL PACTO"}
                       <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M2.5 8h11M9.5 4l4 4-4 4" />
                       </svg>

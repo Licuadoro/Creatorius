@@ -4,7 +4,7 @@ import RuneGlyph from "./RuneGlyph";
 import { RECIBO_HASH } from "../data";
 import { P, MAX, PACES, calcularPacto, fmt, type PaceId, type PactoCfg } from "./Pricing";
 
-type DatosCliente = { n: string; e: string; i: string };
+type DatosCliente = { n: string; e: string; wa: string; i: string };
 
 function leerHash(): { valido: boolean; datos: (PactoCfg & DatosCliente) | null } {
   const hash = window.location.hash || "";
@@ -20,6 +20,7 @@ function leerHash(): { valido: boolean; datos: (PactoCfg & DatosCliente) | null 
       datos: {
         n: String(o.n ?? ""),
         e: String(o.e ?? ""),
+        wa: String(o.wa ?? ""),
         i: String(o.i ?? ""),
         base: o.b === "corp" ? "corp" : "basica",
         r: Math.min(MAX.redaccion, Math.max(0, Number(o.r) || 0)),
@@ -185,8 +186,12 @@ export default function Recibo() {
                 <p className="border-t border-ink-700 px-4 py-3.5 text-[13.5px] italic leading-relaxed text-parch-300/90">
                   «{lectura.datos.i}»
                 </p>
-                {lectura.datos.e && (
-                  <p className="px-4 pb-3.5 font-digital text-[10px] tracking-[0.14em] text-parch-500">RESPONDER A: {lectura.datos.e.toUpperCase()}</p>
+                {(lectura.datos.e || lectura.datos.wa) && (
+                  <p className="px-4 pb-3.5 font-digital text-[10px] tracking-[0.14em] text-parch-500">
+                    {lectura.datos.wa
+                      ? `RESPONDER POR WHATSAPP: ${lectura.datos.wa.toUpperCase()}`
+                      : `RESPONDER A: ${lectura.datos.e.toUpperCase()}`}
+                  </p>
                 )}
               </details>
             )}
