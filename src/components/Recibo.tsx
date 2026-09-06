@@ -113,9 +113,14 @@ function BotRelay() {
       <p className="mt-2.5 text-[12px] leading-relaxed text-parch-400">
         Es un Worker gratuito de Cloudflare (los pasos completos están en el archivo{" "}
         <span className="font-digital text-[11px] text-parch-200">worker-relay/creatorius-relay.js</span> del proyecto).
-        Él guarda las llaves de <span className="text-parch-200">360dialog</span>,{" "}
-        <span className="text-parch-200">Twilio</span> o <span className="text-parch-200">CallMeBot</span> y entrega los
-        pactos a <span className="text-parch-200">{WA_DISPLAY}</span>. Aquí solo pegas su URL y el secreto que le inventes.
+        Él guarda tus llaves de <span className="text-parch-200">Twilio</span> (el que funciona hoy) o{" "}
+        <span className="text-parch-200">CallMeBot</span> y entrega los pactos a{" "}
+        <span className="text-parch-200">{WA_DISPLAY}</span>. Aquí solo pegas su URL y el secreto que le inventes.
+      </p>
+      <p className="mt-2 border border-dashed border-gold-600/30 px-2.5 py-1.5 font-digital text-[8.5px] leading-relaxed tracking-[0.1em] text-parch-600">
+        CUENTA DE PRUEBA TWILIO: los mensajes llegan con el prefijo «Sent from your Twilio trial account» y el enlace
+        «join» del sandbox caduca cada 3 días (hay que volver a enviar «join CODIGO»). Gratis y sin esos límites:
+        CallMeBot (opción B), cuando vuelva a responder.
       </p>
 
       <div className="mt-3 grid gap-2">
