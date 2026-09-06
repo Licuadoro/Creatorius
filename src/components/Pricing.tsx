@@ -332,6 +332,38 @@ export function Ofrendas() {
    CALCULADORA DEL PACTO
 ============================================================ */
 
+/** Cartel que levita de abajo hacia arriba cuando se intenta pasar de un límite. */
+function OverworkToast() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[90] overflow-hidden" aria-hidden="true">
+      <div className="overwork-rise absolute inset-x-0 bottom-[-180px] flex justify-center px-4">
+        <div className="overwork-sway flex items-center gap-4 border border-ember-400/70 bg-[linear-gradient(160deg,#2c1712,#1a0e0b_70%)] px-7 py-4 shadow-[0_26px_70px_-18px_rgba(196,69,60,0.55)]">
+          <span className="pc-corner pc-tl" aria-hidden="true" />
+          <span className="pc-corner pc-tr" aria-hidden="true" />
+          <span className="pc-corner pc-bl" aria-hidden="true" />
+          <span className="pc-corner pc-br" aria-hidden="true" />
+          <svg viewBox="0 0 48 48" className="h-9 w-9 shrink-0 text-ember-400" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 30l14-14" />
+            <path d="M22 8l12 12-7 7-12-12z" />
+            <path d="M34 20l5 5" />
+            <path d="M40 10l2 2M43 16l2 2" />
+            <path d="M8 36l-2 6 6-2" />
+            <path d="M6 42l4-4" />
+          </svg>
+          <span>
+            <span className="block font-display text-[16px] font-bold tracking-wide text-ember-300">
+              ¡Sobreexplotación laboral!
+            </span>
+            <span className="mt-0.5 block font-digital text-[9px] tracking-[0.22em] text-ember-400/90">
+              ESE ELEMENTO YA LLEGÓ A SU LÍMITE
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Stepper({
   label,
   hint,
@@ -341,6 +373,7 @@ function Stepper({
   discountPrice,
   discounted,
   onChange,
+  onOver,
 }: {
   label: string;
   hint: string;
@@ -350,6 +383,7 @@ function Stepper({
   discountPrice?: number;
   discounted?: boolean;
   onChange: (v: number) => void;
+  onOver?: () => void;
 }) {
   const active = discounted && discountPrice !== undefined;
   return (
@@ -382,9 +416,12 @@ function Stepper({
         </span>
         <button
           aria-label={`Añadir ${label}`}
-          onClick={() => onChange(Math.min(max, value + 1))}
-          disabled={value >= max}
-          className="grid h-9 w-9 place-items-center border border-ink-600 text-parch-300 transition-all duration-200 enabled:hover:border-mint-400/70 enabled:hover:text-mint-300 enabled:active:scale-90 disabled:opacity-30"
+          onClick={() => (value >= max ? onOver?.() : onChange(value + 1))}
+          className={`grid h-9 w-9 place-items-center border transition-all duration-200 enabled:active:scale-90 ${
+            value >= max
+              ? "border-ember-500/50 text-ember-400/70 hover:border-ember-400 hover:bg-ember-500/10 hover:text-ember-300"
+              : "border-ink-600 text-parch-300 hover:border-mint-400/70 hover:text-mint-300"
+          }`}
         >
           <svg viewBox="0 0 14 14" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M7 2v10M2 7h10" /></svg>
         </button>
@@ -407,6 +444,8 @@ function Calculator() {
   const [paginas, setPaginas] = useState(0);
   const [garantia, setGarantia] = useState(false);
   const [pace, setPace] = useState<PaceId>("sin");
+  const [overCount, setOverCount] = useState(0);
+  const triggerOver = () => setOverCount((c) => c + 1);
 
   /* ---- sello del pacto: datos del cliente ---- */
   const [nombre, setNombre] = useState("");
@@ -517,6 +556,7 @@ function Calculator() {
 
   return (
     <div id="calculadora" className="mt-24 scroll-mt-28">
+      {overCount > 0 && <OverworkToast key={overCount} />}
       <Reveal>
         <p className="font-digital text-[11px] tracking-[0.3em] text-gold-500">
           <span className="text-mint-400">//</span> LA CALCULADORA DEL PACTO
@@ -572,10 +612,10 @@ function Calculator() {
             <div>
               <p className="mb-3 font-digital text-[10px] tracking-[0.24em] text-parch-500">02 · AÑADIDOS AL CONJURO</p>
               <div className="grid gap-3">
-                <Stepper label="Redacción" hint="máx. 10" value={redaccion} max={MAX.redaccion} unitPrice={P.redaccion} discountPrice={P.redaccionD} discounted={ambos} onChange={setRedaccion} />
-                <Stepper label="Ilustración grande" hint="máx. 5" value={grande} max={MAX.grande} unitPrice={P.grande} discountPrice={P.grandeD} discounted={ambos} onChange={setGrande} />
-                <Stepper label="Dibujo pequeño" hint="sin límite" value={dibujo} max={MAX.dibujo} unitPrice={P.dibujo} discountPrice={P.dibujoD} discounted={ambos} onChange={setDibujo} />
-                <Stepper label="Páginas adicionales" hint="máx. 10 · sin descuento" value={paginas} max={MAX.pagina} unitPrice={P.pagina} onChange={setPaginas} />
+                <Stepper label="Redacción" hint="máx. 10" value={redaccion} max={MAX.redaccion} unitPrice={P.redaccion} discountPrice={P.redaccionD} discounted={ambos} onChange={setRedaccion} onOver={triggerOver} />
+                <Stepper label="Ilustración grande" hint="máx. 5" value={grande} max={MAX.grande} unitPrice={P.grande} discountPrice={P.grandeD} discounted={ambos} onChange={setGrande} onOver={triggerOver} />
+                <Stepper label="Dibujo pequeño" hint="sin límite" value={dibujo} max={MAX.dibujo} unitPrice={P.dibujo} discountPrice={P.dibujoD} discounted={ambos} onChange={setDibujo} onOver={triggerOver} />
+                <Stepper label="Páginas adicionales" hint="máx. 10 · sin descuento" value={paginas} max={MAX.pagina} unitPrice={P.pagina} onChange={setPaginas} onOver={triggerOver} />
               </div>
 
               {/* estado «¡Ambos!» */}

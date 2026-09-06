@@ -343,6 +343,31 @@ details.oracle[open] .oracle-q { color: var(--color-gold-300); }
 }
 .ambos-on { animation: banner-glow 2.6s ease-in-out infinite; }
 
+/* ---------- cartel de sobreexplotación ---------- */
+@keyframes overwork-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  8% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { transform: translateY(-125vh); opacity: 0; }
+}
+.overwork-rise { animation: overwork-rise 2.6s cubic-bezier(0.33, 0.7, 0.45, 1) forwards; }
+
+@keyframes overwork-sway {
+  0%, 100% { transform: translateX(-10px) rotate(-2.5deg); }
+  50% { transform: translateX(10px) rotate(2.5deg); }
+}
+.overwork-sway { animation: overwork-sway 1.15s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .overwork-rise { animation: overwork-fade 2s ease forwards; }
+  .overwork-sway { animation: none; }
+}
+@keyframes overwork-fade {
+  0% { opacity: 0; }
+  15%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ---------- lightbox de ilustraciones ---------- */
 @keyframes lightbox-fade {
   from { opacity: 0; }
