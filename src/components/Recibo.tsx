@@ -1,7 +1,17 @@
 import { useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import RuneGlyph from "./RuneGlyph";
-import { CMB_KEY, CMB_LS_KEY, RECIBO_HASH, WA_DISPLAY, WA_NUM } from "../data";
+import {
+  CMB_KEY,
+  CMB_LS_KEY,
+  RECIBO_HASH,
+  RELAY_LS_SECRET,
+  RELAY_LS_URL,
+  RELAY_SECRET,
+  RELAY_URL,
+  WA_DISPLAY,
+  WA_NUM,
+} from "../data";
 import { P, MAX, PACES, calcularPacto, fmt, type PaceId, type PactoCfg } from "./Pricing";
 
 type DatosCliente = { n: string; e: string; wa: string; i: string };
@@ -41,7 +51,126 @@ const DEFAULT_CFG: PactoCfg = { base: "basica", r: 0, g: 0, d: 0, p: 0, w: false
 const LS_CUENTA = "creatorius:cuenta";
 
 /**
- * Panel privado para configurar el bot de WhatsApp (CallMeBot).
+ * Panel del repetidor (Worker de Cloudflare): guarda la URL y el secreto
+ * en este navegador y permite probar el envío al instante.
+ */
+function BotRelay() {
+  const [url, setUrl] = useState<string>(() => {
+    try { return localStorage.getItem(RELAY_LS_URL) ?? RELAY_URL; } catch { return RELAY_URL; }
+  });
+  const [secret, setSecret] = useState<string>(() => {
+    try { return localStorage.getItem(RELAY_LS_SECRET) ?? RELAY_SECRET; } catch { return RELAY_SECRET; }
+  });
+  const [test, setTest] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [flash, setFlash] = useState(false);
+
+  const activa = url.trim().length > 0;
+
+  const guardar = () => {
+    try {
+      if (url.trim()) localStorage.setItem(RELAY_LS_URL, url.trim());
+      else localStorage.removeItem(RELAY_LS_URL);
+      if (secret.trim()) localStorage.setItem(RELAY_LS_SECRET, secret.trim());
+      else localStorage.removeItem(RELAY_LS_SECRET);
+    } catch { /* sin almacenamiento */ }
+    setFlash(true);
+    window.setTimeout(() => setFlash(false), 2600);
+  };
+
+  const probar = async () => {
+    if (!url.trim()) return;
+    setTest("sending");
+    try {
+      const res = await fetch(url.trim(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Pacto-Secret": secret.trim() },
+        body: JSON.stringify({
+          text: "Prueba del repetidor de Creatorius: si lees esto en tu WhatsApp, los pactos te llegarán por aquí.",
+          to: WA_NUM,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setTest(res.ok && data.ok ? "ok" : "error");
+    } catch {
+      setTest("error");
+    }
+  };
+
+  return (
+    <div className="mt-3.5 border border-gold-500/35 bg-gold-500/[0.04] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-digital text-[9.5px] tracking-[0.22em] text-gold-300">OPCIÓN A · EL REPETIDOR (RECOMENDADO)</p>
+        <span
+          className={`flex items-center gap-1.5 border px-2 py-1 font-digital text-[9px] tracking-[0.14em] transition-colors duration-300 ${
+            activa ? "border-gold-500/50 bg-gold-500/[0.08] text-gold-300" : "border-ink-600 text-parch-500"
+          }`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${activa ? "bg-gold-400" : "bg-parch-600"}`} />
+          {activa ? "REPETIDOR ACTIVO" : "SIN CONFIGURAR"}
+        </span>
+      </div>
+
+      <p className="mt-2.5 text-[12px] leading-relaxed text-parch-400">
+        Es un Worker gratuito de Cloudflare (los pasos completos están en el archivo{" "}
+        <span className="font-digital text-[11px] text-parch-200">worker-relay/creatorius-relay.js</span> del proyecto).
+        Él guarda las llaves de <span className="text-parch-200">360dialog</span>,{" "}
+        <span className="text-parch-200">Twilio</span> o <span className="text-parch-200">CallMeBot</span> y entrega los
+        pactos a <span className="text-parch-200">{WA_DISPLAY}</span>. Aquí solo pegas su URL y el secreto que le inventes.
+      </p>
+
+      <div className="mt-3 grid gap-2">
+        <label className="block">
+          <span className="font-digital text-[8.5px] tracking-[0.18em] text-parch-500">URL DEL WORKER</span>
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://creatorius-relay.tu-usuario.workers.dev"
+            className="pacto-input mt-1 font-digital text-[12px]"
+          />
+        </label>
+        <label className="block">
+          <span className="font-digital text-[8.5px] tracking-[0.18em] text-parch-500">SECRETO COMPARTIDO (EL PACTO_SECRET DEL WORKER)</span>
+          <input
+            type="text"
+            value={secret}
+            onChange={(e) => setSecret(e.target.value)}
+            placeholder="la frase secreta que le pusiste al Worker"
+            className="pacto-input mt-1 font-digital text-[12px]"
+          />
+        </label>
+      </div>
+
+      <div className="mt-2.5 flex items-center gap-2">
+        <button
+          onClick={guardar}
+          className="shrink-0 border border-gold-500/50 bg-gold-500/[0.08] px-3.5 py-2 font-digital text-[9px] tracking-[0.16em] text-gold-300 transition-all duration-300 hover:bg-gold-500/20"
+        >
+          {flash ? "¡GUARDADO!" : "GUARDAR"}
+        </button>
+        <button
+          onClick={() => void probar()}
+          disabled={!activa || test === "sending"}
+          className="shrink-0 border border-ink-600 bg-ink-850/80 px-3.5 py-2 font-digital text-[9px] tracking-[0.16em] text-parch-300 transition-all duration-300 enabled:hover:border-gold-500/60 enabled:hover:text-gold-300 disabled:opacity-40"
+        >
+          {test === "sending" ? "PROBANDO…" : "PROBAR ENVÍO"}
+        </button>
+        {test === "ok" && <span className="font-digital text-[9px] tracking-[0.14em] text-mint-300">¡MIRA TU WHATSAPP!</span>}
+        {test === "error" && (
+          <span className="font-digital text-[9px] leading-relaxed tracking-[0.14em] text-red-300/90">
+            NO LLEGÓ — REVISA URL, SECRETO Y LAS LLAVES DEL WORKER
+          </span>
+        )}
+      </div>
+      <p className="mt-2.5 font-digital text-[8.5px] leading-relaxed tracking-[0.1em] text-parch-600">
+        SE GUARDA EN ESTE NAVEGADOR · PARA TODOS LOS VISITANTES, PEGA URL Y SECRETO TAMBIÉN EN src/data.ts (RELAY_URL, RELAY_SECRET)
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Panel privado para configurar la entrega de pactos por WhatsApp.
  * Solo se muestra en la mesa de recibos, que ya es una página de acceso privado.
  */
 function BotWhatsApp() {
@@ -86,7 +215,7 @@ function BotWhatsApp() {
   return (
     <div className="border border-mint-500/30 bg-mint-500/[0.03] p-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="font-digital text-[10px] tracking-[0.24em] text-mint-300">04 · BOT DE WHATSAPP (SOLO PARA TI)</p>
+        <p className="font-digital text-[10px] tracking-[0.24em] text-mint-300">04 · ENTREGA POR WHATSAPP (SOLO PARA TI)</p>
         <span
           className={`flex items-center gap-1.5 border px-2 py-1 font-digital text-[9px] tracking-[0.14em] transition-colors duration-300 ${
             efectiva ? "border-mint-500/50 bg-mint-500/[0.08] text-mint-300" : "border-ink-600 text-parch-500"
@@ -98,8 +227,18 @@ function BotWhatsApp() {
       </div>
 
       <p className="mt-3 text-[12px] leading-relaxed text-parch-400">
-        Para que los pactos por WhatsApp te lleguen solos a <span className="text-parch-200">{WA_DISPLAY}</span> (sin que el
-        cliente abra ni envíe nada), activa el bot gratuito <span className="text-parch-200">CallMeBot</span> una sola vez:
+        Para que los pactos por WhatsApp te lleguen solos a <span className="text-parch-200">{WA_DISPLAY}</span> (sin que
+        el cliente abra ni envíe nada) hay dos caminos: el repetidor (admite 360dialog, Twilio y CallMeBot, con las
+        llaves ocultas y seguras) o CallMeBot en directo.
+      </p>
+
+      <BotRelay />
+
+      <p className="mt-5 font-digital text-[9.5px] tracking-[0.22em] text-mint-300">
+        OPCIÓN B · CALLMEBOT EN DIRECTO (GRATIS, A VECES SATURADO)
+      </p>
+      <p className="mt-2 text-[12px] leading-relaxed text-parch-400">
+        Se activa una sola vez. Si el bot no contesta en 2 minutos, su web oficial dice que se reintente a las 24 horas:
       </p>
       <ol className="mt-2.5 space-y-2 text-[12px] leading-relaxed text-parch-400">
         <li className="flex gap-2.5">

@@ -1,6 +1,17 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Reveal, SectionHeading } from "./Chrome";
-import { CMB_KEY, CMB_LS_KEY, LICUADO_URL, RECIBO_HASH, WA_DISPLAY, WA_NUM } from "../data";
+import {
+  CMB_KEY,
+  CMB_LS_KEY,
+  LICUADO_URL,
+  RECIBO_HASH,
+  RELAY_LS_SECRET,
+  RELAY_LS_URL,
+  RELAY_SECRET,
+  RELAY_URL,
+  WA_DISPLAY,
+  WA_NUM,
+} from "../data";
 import { Money, useCurrency } from "../currency";
 
 /* ============================================================
@@ -558,34 +569,60 @@ function Calculator() {
     }
   };
 
-  /* Canal B: lo entrega el bot de WhatsApp (sin que el cliente inicie sesión en nada). */
+  /* Canal B: lo entrega un bot de WhatsApp (sin que el cliente inicie sesión en nada).
+     Orden: repetidor (Worker) → CallMeBot directo → compartir manual. */
   const enviarWhatsApp = async () => {
-    // La llave puede venir del navegador (configurada en la mesa de recibos) o del código.
-    let key = "";
+    let relayUrl = RELAY_URL.trim();
+    let relaySecret = RELAY_SECRET.trim();
+    let cmbKey = CMB_KEY.trim();
     try {
-      key = (localStorage.getItem(CMB_LS_KEY) ?? "").trim();
+      relayUrl = (localStorage.getItem(RELAY_LS_URL) ?? "").trim() || relayUrl;
+      relaySecret = (localStorage.getItem(RELAY_LS_SECRET) ?? "").trim() || relaySecret;
+      cmbKey = (localStorage.getItem(CMB_LS_KEY) ?? "").trim() || cmbKey;
     } catch {
       /* sin almacenamiento */
     }
-    if (!key) key = CMB_KEY.trim();
 
-    if (key) {
+    /* 1) El repetidor: llaves ocultas, canales 360dialog / Twilio / CallMeBot. */
+    if (relayUrl) {
+      setVia("whatsapp-bot");
+      setEnvio("sending");
+      try {
+        const res = await fetch(relayUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Pacto-Secret": relaySecret },
+          body: JSON.stringify({ text: textoWhatsApp, to: WA_NUM }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
+          setEnvio("sent");
+          return;
+        }
+        throw new Error("el repetidor falló");
+      } catch {
+        /* cae al siguiente canal */
+      }
+    }
+
+    /* 2) CallMeBot directo. */
+    if (cmbKey) {
       setVia("whatsapp-bot");
       setEnvio("sending");
       // El bot se llama con un GET; la respuesta no se lee, así que CORS no importa.
       const url = `https://api.callmebot.com/whatsapp.php?phone=${WA_NUM}&text=${encodeURIComponent(
         textoWhatsApp
-      )}&apikey=${encodeURIComponent(key)}`;
+      )}&apikey=${encodeURIComponent(cmbKey)}`;
       const img = new Image();
       img.src = url;
       // CallMeBot responde al instante; damos margen y marcamos enviado.
       window.setTimeout(() => setEnvio("sent"), 900);
-    } else {
-      // Sin llave configurada: se abre WhatsApp del cliente con el mensaje ya escrito.
-      setVia("whatsapp-manual");
-      window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(textoWhatsApp)}`, "_blank", "noopener");
-      setEnvio("sent");
+      return;
     }
+
+    /* 3) Último recurso: se abre WhatsApp del cliente con el mensaje ya escrito. */
+    setVia("whatsapp-manual");
+    window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(textoWhatsApp)}`, "_blank", "noopener");
+    setEnvio("sent");
   };
 
   return (
