@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import RuneGlyph from "./RuneGlyph";
-import { HEADLINE_LINES } from "../data";
+import { HEADLINE_LINES, HIDDEN_SENTENCE } from "../data";
 import { useReducedMotion } from "../hooks";
 
-type Cell = { ch: string; g: number; endOfLine: boolean };
+/* Las runas no son decorativas: cada una toma su forma de una letra de la
+   frase secreta (HIDDEN_SENTENCE), así que el conjuro deletrea en clave:
+   "Construyó tú idea con el nivel de detalle de un dios creando un mundo…" */
+const HIDDEN_LETTERS = Array.from(HIDDEN_SENTENCE).filter((c) => /\p{L}/u.test(c));
+
+type Cell = { ch: string; g: number; endOfLine: boolean; runeCh: string };
 
 const GLYPH_MS = 96;
 const SPACE_MS = 42;
@@ -15,9 +20,15 @@ export default function RuneText() {
 
   const cells = useMemo<Cell[]>(() => {
     const out: Cell[] = [];
+    let hi = 0; // índice dentro de la frase secreta
     HEADLINE_LINES.forEach((line, li) => {
       Array.from(line).forEach((ch) => {
-        out.push({ ch, g: out.length, endOfLine: li < HEADLINE_LINES.length - 1 && false });
+        // solo las celdas que dibujan runa consumen una letra de la frase oculta
+        const hidden = HIDDEN_LETTERS[hi++ % HIDDEN_LETTERS.length]
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        const runeCh = ch === " " ? " " : hidden;
+        out.push({ ch, g: out.length, endOfLine: li < HEADLINE_LINES.length - 1 && false, runeCh });
       });
     });
     // marca el final de cada línea (salvo la última)
@@ -107,16 +118,16 @@ export default function RuneText() {
               const on = c.g < revealed;
               const isNext = !done && c.g === revealed && c.ch !== " ";
               return (
-                <span key={c.g} className={`rc ${isNext ? "next" : ""}`} data-on={on}>
+                <span key={c.g} className={`rc ${isNext ? "next" : ""}`} data-on={on} aria-hidden="true">
                   {c.ch !== " " && (
                     <span
                       className="rc-rune"
                       style={{ "--rd": `${Math.min(c.g * 16, 1000)}ms` } as React.CSSProperties}
                     >
-                      <RuneGlyph ch={c.ch} />
+                      <RuneGlyph ch={c.runeCh} />
                     </span>
                   )}
-                  <span className="rc-letter" aria-hidden="true">
+                  <span className="rc-letter">
                     {c.ch}
                   </span>
                 </span>
