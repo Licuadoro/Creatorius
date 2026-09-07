@@ -26,8 +26,8 @@ export const TIEMPOS_BASE = {
   ilustracion: 2,      // 2 días
   dibujo: 10 / 1440,   // 10 minutos en días (10/1440)
   pagina: 1,           // 1 día
-  webBasica: 7.5,      // 1.5 semanas = 7.5 días (asumiendo semana laboral de 5 días)
-  webCorp: 15,         // 3 semanas = 15 días
+  webBasica: 10.5,     // 1.5 semanas = 10.5 días (semanas de 7 días)
+  webCorp: 21,         // 3 semanas = 21 días
 };
 
 export const fmt = (n: number) => n.toLocaleString("es-CO");
