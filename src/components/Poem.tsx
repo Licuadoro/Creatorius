@@ -103,78 +103,139 @@ export default function Poem() {
             </span>
           ))}
         </p>
+
+        {/* Grieta en la esquina inferior derecha */}
+        {shatterStarted && (
+          <div 
+            className="absolute bottom-2 right-2 pointer-events-none"
+            style={{
+              opacity: saffronGrowing ? 0 : 1,
+              transition: 'opacity 0.3s ease-out',
+              zIndex: 5,
+            }}
+          >
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <path 
+                d="M0 0 Q15 10 25 5 Q35 0 45 10 Q55 20 60 35 Q65 50 70 65 L75 75" 
+                stroke="#c0392b" 
+                strokeWidth="2" 
+                fill="none"
+                strokeLinecap="round"
+                className="crack-line"
+                style={{
+                  strokeDasharray: 150,
+                  strokeDashoffset: saffronGrowing ? 0 : 150,
+                  transition: 'stroke-dashoffset 0.6s ease-out',
+                  transitionDelay: '0.2s',
+                }}
+              />
+              <path 
+                d="M25 5 Q20 15 30 25 Q40 35 35 45" 
+                stroke="#c0392b" 
+                strokeWidth="1.5" 
+                fill="none"
+                strokeLinecap="round"
+                opacity="0.7"
+                style={{
+                  strokeDasharray: 80,
+                  strokeDashoffset: saffronGrowing ? 0 : 80,
+                  transition: 'stroke-dashoffset 0.5s ease-out',
+                  transitionDelay: '0.4s',
+                }}
+              />
+              <path 
+                d="M45 10 Q50 20 45 30 Q40 40 50 50" 
+                stroke="#c0392b" 
+                strokeWidth="1" 
+                fill="none"
+                strokeLinecap="round"
+                opacity="0.5"
+                style={{
+                  strokeDasharray: 70,
+                  strokeDashoffset: saffronGrowing ? 0 : 70,
+                  transition: 'stroke-dashoffset 0.4s ease-out',
+                  transitionDelay: '0.5s',
+                }}
+              />
+            </svg>
+          </div>
+        )}
       </div>
 
-      {/* Azafrán que crece después de romper el cuadro */}
+      {/* Azafrán que crece desde la grieta en la esquina inferior derecha */}
       {(shatterStarted || saffronGrowing) && (
         <div 
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{ zIndex: 10 }}
+          className="absolute bottom-0 right-0 pointer-events-none"
+          style={{ 
+            zIndex: 10,
+            transform: 'translateX(30%) translateY(20%)',
+          }}
         >
           <div 
             className="relative"
             style={{
-              opacity: shatterStarted ? 1 : 0,
+              opacity: shatterStarted ? 0 : 1,
               transform: saffronGrowing ? 'scale(1)' : 'scale(0)',
-              transition: 'transform 2s ease-out, opacity 0.5s ease-out',
-              transitionDelay: shatterStarted ? '0.6s' : '0s',
+              transformOrigin: 'bottom right',
+              transition: 'transform 2.5s ease-out, opacity 0.8s ease-out',
+              transitionDelay: shatterStarted ? '0.8s' : '0s',
             }}
           >
             {/* Flor de azafrán SVG */}
             <svg 
-              width="120" 
-              height="180" 
-              viewBox="0 0 120 180" 
+              width="140" 
+              height="200" 
+              viewBox="0 0 140 200" 
               className="drop-shadow-lg"
             >
-              {/* Tallo */}
+              {/* Tallo curvado */}
               <path 
-                d="M60 180 Q58 140 60 100 Q62 70 60 50" 
+                d="M70 200 Q65 160 68 120 Q72 80 70 50 Q68 30 70 20" 
                 stroke="#4a7c23" 
-                strokeWidth="4" 
+                strokeWidth="5" 
                 fill="none"
                 className="saffron-stem"
                 style={{
-                  strokeDasharray: 200,
-                  strokeDashoffset: saffronGrowing ? 0 : 200,
-                  transition: 'stroke-dashoffset 1.5s ease-out',
-                  transitionDelay: '0.8s',
+                  strokeDasharray: 220,
+                  strokeDashoffset: saffronGrowing ? 0 : 220,
+                  transition: 'stroke-dashoffset 1.8s ease-out',
+                  transitionDelay: '1s',
                 }}
               />
               
               {/* Hojas */}
               <ellipse 
-                cx="52" 
-                cy="140" 
-                rx="8" 
-                ry="25" 
+                cx="62" 
+                cy="160" 
+                rx="10" 
+                ry="30" 
                 fill="#5a9c33"
-                transform="rotate(-25 52 140)"
+                transform="rotate(-30 62 160)"
                 opacity="0"
                 className="saffron-leaf-left"
                 style={{
                   opacity: saffronGrowing ? 0.9 : 0,
-                  transform: saffronGrowing ? 'rotate(-25deg) scale(1)' : 'rotate(-25deg) scale(0)',
-                  transformOrigin: '52 140',
-                  transition: 'all 1s ease-out',
-                  transitionDelay: '1.2s',
+                  transform: saffronGrowing ? 'rotate(-30deg) scale(1)' : 'rotate(-30deg) scale(0)',
+                  transformOrigin: '62 160',
+                  transition: 'all 1.2s ease-out',
+                  transitionDelay: '1.5s',
                 }}
               />
               <ellipse 
-                cx="68" 
-                cy="120" 
-                rx="7" 
-                ry="22" 
+                cx="78" 
+                cy="135" 
+                rx="9" 
+                ry="26" 
                 fill="#5a9c33"
-                transform="rotate(20 68 120)"
+                transform="rotate(25 78 135)"
                 opacity="0"
                 className="saffron-leaf-right"
                 style={{
                   opacity: saffronGrowing ? 0.9 : 0,
-                  transform: saffronGrowing ? 'rotate(20deg) scale(1)' : 'rotate(20deg) scale(0)',
-                  transformOrigin: '68 120',
-                  transition: 'all 1s ease-out',
-                  transitionDelay: '1.4s',
+                  transform: saffronGrowing ? 'rotate(25deg) scale(1)' : 'rotate(25deg) scale(0)',
+                  transformOrigin: '78 135',
+                  transition: 'all 1.2s ease-out',
+                  transitionDelay: '1.7s',
                 }}
               />
               
@@ -185,43 +246,43 @@ export default function Poem() {
                 style={{
                   opacity: saffronGrowing ? 1 : 0,
                   transform: saffronGrowing ? 'scale(1)' : 'scale(0)',
-                  transformOrigin: '60 50',
-                  transition: 'all 1.2s ease-out',
-                  transitionDelay: '1.6s',
+                  transformOrigin: '70 25',
+                  transition: 'all 1.5s ease-out',
+                  transitionDelay: '2s',
                 }}
               >
                 {/* Pétalos exteriores */}
-                <ellipse cx="60" cy="35" rx="12" ry="20" fill="#9b59b6" transform="rotate(0 60 35)" />
-                <ellipse cx="60" cy="35" rx="12" ry="20" fill="#8e44ad" transform="rotate(72 60 35)" />
-                <ellipse cx="60" cy="35" rx="12" ry="20" fill="#9b59b6" transform="rotate(144 60 35)" />
-                <ellipse cx="60" cy="35" rx="12" ry="20" fill="#8e44ad" transform="rotate(216 60 35)" />
-                <ellipse cx="60" cy="35" rx="12" ry="20" fill="#9b59b6" transform="rotate(288 60 35)" />
+                <ellipse cx="70" cy="25" rx="14" ry="22" fill="#9b59b6" transform="rotate(0 70 25)" />
+                <ellipse cx="70" cy="25" rx="14" ry="22" fill="#8e44ad" transform="rotate(72 70 25)" />
+                <ellipse cx="70" cy="25" rx="14" ry="22" fill="#9b59b6" transform="rotate(144 70 25)" />
+                <ellipse cx="70" cy="25" rx="14" ry="22" fill="#8e44ad" transform="rotate(216 70 25)" />
+                <ellipse cx="70" cy="25" rx="14" ry="22" fill="#9b59b6" transform="rotate(288 70 25)" />
                 
                 {/* Estigmas rojos característicos del azafrán */}
                 <path 
-                  d="M60 35 Q60 25 55 18" 
+                  d="M70 25 Q70 12 63 5" 
                   stroke="#c0392b" 
-                  strokeWidth="2.5" 
+                  strokeWidth="3" 
                   fill="none" 
                   strokeLinecap="round"
                 />
                 <path 
-                  d="M60 35 Q60 25 60 15" 
+                  d="M70 25 Q70 10 70 0" 
                   stroke="#c0392b" 
-                  strokeWidth="2.5" 
+                  strokeWidth="3" 
                   fill="none" 
                   strokeLinecap="round"
                 />
                 <path 
-                  d="M60 35 Q60 25 65 18" 
+                  d="M70 25 Q70 12 77 5" 
                   stroke="#c0392b" 
-                  strokeWidth="2.5" 
+                  strokeWidth="3" 
                   fill="none" 
                   strokeLinecap="round"
                 />
                 
                 {/* Centro amarillo */}
-                <circle cx="60" cy="40" r="6" fill="#f39c12" />
+                <circle cx="70" cy="30" r="7" fill="#f39c12" />
               </g>
             </svg>
           </div>
@@ -233,31 +294,26 @@ export default function Poem() {
           0% {
             opacity: 1;
             transform: scale(1) rotate(0deg);
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
           }
           20% {
-            opacity: 0.9;
-            transform: scale(1.02) rotate(-1deg);
+            opacity: 0.95;
+            transform: scale(1.01) rotate(-0.5deg);
           }
           40% {
-            opacity: 0.7;
-            transform: scale(1.05) rotate(2deg);
+            opacity: 0.9;
+            transform: scale(1.02) rotate(1deg);
           }
           60% {
-            opacity: 0.5;
-            transform: scale(1.08) rotate(-3deg);
-            filter: blur(2px);
+            opacity: 0.85;
+            filter: blur(1px);
           }
           80% {
-            opacity: 0.3;
-            transform: scale(1.1) rotate(5deg);
-            filter: blur(4px);
+            opacity: 0.8;
+            filter: blur(2px);
           }
           100% {
-            opacity: 0;
-            transform: scale(1.15) rotate(10deg);
-            filter: blur(8px);
-            clip-path: polygon(20% 20%, 80% 20%, 80% 80%, 20% 80%);
+            opacity: 0.75;
+            filter: blur(3px);
           }
         }
       `}</style>
