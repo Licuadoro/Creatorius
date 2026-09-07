@@ -79,14 +79,7 @@ export default function Poem() {
     <div ref={ref} className="relative">
       <div 
         ref={poemRef}
-        className={`relative mx-auto max-w-3xl border border-ink-600/80 bg-ink-850/85 px-7 py-9 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.85)] transition-transform duration-700 md:px-12 md:py-11 ${
-          shatterStarted ? 'animate-shatter' : ''
-        }`}
-        style={{
-          ...(shatterStarted ? {
-            animation: 'shatter 0.8s ease-out forwards',
-          } : {}),
-        }}
+        className={`relative mx-auto max-w-3xl border border-ink-600/80 bg-ink-850/85 px-7 py-9 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.85)] md:px-12 md:py-11`}
       >
         {/* esquinas del pliego */}
         <span className="pointer-events-none absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-gold-500/50" aria-hidden="true" />
@@ -288,35 +281,6 @@ export default function Poem() {
           </div>
         </div>
       )}
-      
-      <style>{`
-        @keyframes shatter {
-          0% {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-          }
-          20% {
-            opacity: 0.95;
-            transform: scale(1.01) rotate(-0.5deg);
-          }
-          40% {
-            opacity: 0.9;
-            transform: scale(1.02) rotate(1deg);
-          }
-          60% {
-            opacity: 0.85;
-            filter: blur(1px);
-          }
-          80% {
-            opacity: 0.8;
-            filter: blur(2px);
-          }
-          100% {
-            opacity: 0.75;
-            filter: blur(3px);
-          }
-        }
-      `}</style>
     </div>
   );
 }
