@@ -61,7 +61,7 @@ const STEPS = [
     sigil: "trazo",
     num: "II",
     title: "Comienzo",
-    text: "Tras haber pagado, yo comienzo a crear los trazos sobre los planos, hago la web funcional, te comparto actualizaciones, y me puedes pedir cambios.",
+    text: "Tras haber saldado un precio justo y negociado, yo comienzo a crear los trazos sobre los planos, hago la web funcional, te comparto actualizaciones, y me puedes pedir cambios.",
   },
   {
     sigil: "elementos",
