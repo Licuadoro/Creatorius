@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import RuneGlyph from "./RuneGlyph";
 import { RECIBO_HASH } from "../data";
-import { P, MAX, PACES, calcularPacto, fmt, type PaceId, type PactoCfg } from "./Pricing";
+import { P, MAX, PACES, calcularPacto, fmt, type PaceId, type PactoCfg, TIEMPOS_BASE } from "./Pricing";
 
 type DatosCliente = { n: string; e: string; i: string };
 
@@ -38,6 +38,27 @@ function leerHash(): { valido: boolean; datos: (PactoCfg & DatosCliente) | null 
 const DEFAULT_CFG: PactoCfg = { base: "basica", r: 0, g: 0, d: 0, p: 0, w: false, v: "sin" };
 
 const LS_CUENTA = "creatorius:cuenta";
+
+/** Formatea días a texto legible */
+function formatarTiempo(dias: number): string {
+  if (dias < 1) {
+    const horas = Math.round(dias * 24);
+    if (horas < 1) {
+      const minutos = Math.round(dias * 24 * 60);
+      return `${minutos} min`;
+    }
+    return `${horas} h`;
+  }
+  if (dias < 7) {
+    return `${Math.round(dias)} día${dias >= 2 ? "s" : ""}`;
+  }
+  const semanas = dias / 7;
+  if (semanas < 4) {
+    return `${semanas.toFixed(1).replace(".0", "")} semana${semanas >= 2 ? "s" : ""}`;
+  }
+  const meses = dias / 30;
+  return `${meses.toFixed(1).replace(".0", "")} mes${meses >= 2 ? "es" : ""}`;
+}
 
 function MiniStepper({ label, value, max, onChange }: { label: string; value: number; max: number; onChange: (v: number) => void }) {
   return (
@@ -82,6 +103,9 @@ export default function Recibo() {
   const reciboRef = useRef<HTMLDivElement | null>(null);
   const calc = useMemo(() => calcularPacto(cfg), [cfg]);
   const paceData = PACES.find((p) => p.id === cfg.v)!;
+  
+  // Estado para tiempo personalizado (en días)
+  const [tiempoPersonalizado, setTiempoPersonalizado] = useState<string>("");
 
   const folio = useMemo(() => `R-${Math.random().toString(36).slice(2, 7).toUpperCase()}`, []);
   const fecha = useMemo(
@@ -284,6 +308,35 @@ export default function Recibo() {
             <p className="mt-2 font-digital text-[9px] tracking-[0.16em] text-parch-600">SE GUARDA EN ESTE NAVEGADOR PARA PRÓXIMOS RECIBOS</p>
           </div>
 
+          <div>
+            <p className="font-digital text-[10px] tracking-[0.24em] text-parch-500">04 · TIEMPO DE ENTREGA PERSONALIZADO (OPCIONAL)</p>
+            <div className="mt-3 flex items-stretch gap-2.5">
+              <div className={`flex flex-1 items-center gap-2 border px-4 ${tiempoPersonalizado ? "border-gold-500/60 bg-ink-850" : "border-ink-600 bg-ink-850/80"}`}>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  value={tiempoPersonalizado}
+                  onChange={(e) => setTiempoPersonalizado(e.target.value)}
+                  placeholder="Déjalo vacío para usar el calculado"
+                  className="w-full bg-transparent py-3.5 font-digital text-[18px] text-gold-300 outline-none placeholder:text-parch-600"
+                />
+                <span className="shrink-0 font-digital text-[11px] tracking-[0.14em] text-parch-500">días</span>
+              </div>
+              <button
+                onClick={() => setTiempoPersonalizado(String(Math.round(calc.tiempoDias)))}
+                title="Usar el tiempo calculado automáticamente"
+                className="shrink-0 border border-ink-600 bg-ink-850/80 px-4 font-digital text-[10px] tracking-[0.14em] text-parch-300 transition-all duration-300 hover:border-gold-500/60 hover:text-gold-300"
+              >
+                USAR CALCULADO
+                <span className="mt-0.5 block text-[10px] text-gold-500">{formatarTiempo(calc.tiempoDias)}</span>
+              </button>
+            </div>
+            <p className="mt-2 font-digital text-[9px] tracking-[0.16em] text-parch-600">
+              CALCULADO: {formatarTiempo(calc.tiempoDias)} · RITMO {paceData.title.toUpperCase()}
+            </p>
+          </div>
+
           <button
             onClick={exportar}
             disabled={estado === "generando" || !precioValido}
@@ -361,7 +414,11 @@ export default function Recibo() {
                   </span>
                 </p>
                 <p className="mt-1 font-digital text-[10px] tracking-[0.22em] text-parch-500">
-                  POR LA FORJA DE SU WEB · RITMO: {paceData.title.toUpperCase()} · HASTA {paceData.weeks.toUpperCase()}
+                  POR LA FORJA DE SU WEB · RITMO: {paceData.title.toUpperCase()} · ENTREGA EN ALREDEDOR DE{" "}
+                  <span className="text-parch-300">
+                    {tiempoPersonalizado ? formatarTiempo(Number(tiempoPersonalizado)) : paceData.weeks}
+                  </span>
+                  {", PERO DEPENDE DE LA IDEA QUE TENGAS"}
                 </p>
 
                 <ul className="mt-6 space-y-2.5">
