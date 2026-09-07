@@ -715,6 +715,8 @@ function Calculator() {
               <div className="grid gap-3 sm:grid-cols-3">
                 {PACES.map((p) => {
                   const on = pace === p.id;
+                  // Calcular tiempo estimado para este ritmo
+                  const tiempoEstimado = formatTimeEstimate(calc.tiempoDias * (p.timeMultiplier / paceData.timeMultiplier));
                   return (
                     <button
                       key={p.id}
@@ -736,7 +738,7 @@ function Calculator() {
                       </span>
                       {p.desc && <span className="mt-1.5 block text-[13px] italic leading-snug text-parch-300/85">{p.desc}</span>}
                       <span className={`mt-1.5 block font-digital text-[10px] tracking-[0.12em] ${on ? "text-gold-300" : "text-parch-500"}`}>
-                        {p.sub.toUpperCase()}
+                        EN ALREDEDOR DE {tiempoEstimado.toUpperCase()}
                       </span>
                     </button>
                   );
