@@ -1,3 +1,66 @@
 ```
+# Dependencies
 node_modules/
+
+# Build artifacts
+dist/
+
+# Environment variables
+.env*
+!.env.example
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.out
+*.exe
+*.dll
+*.so
+*.a
+
+# Coverage reports
+coverage/
+htmlcov/
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# TypeScript
+*.tsbuildinfo
+.next/
+.nuxt/
+dist/
+
+# Vite
+.vite/
+
+# Supabase
+.supabase/
+
+# Database
+*.db
+*.db-journal
+
+# System
+.DS_Store
+Thumbs.db
 ```

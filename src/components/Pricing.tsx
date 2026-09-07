@@ -26,8 +26,8 @@ export const TIEMPOS_BASE = {
   ilustracion: 2,      // 2 días
   dibujo: 10 / 1440,   // 10 minutos en días (10/1440)
   pagina: 1,           // 1 día
-  webBasica: 7.5,      // 1.5 semanas = 7.5 días (asumiendo semana laboral de 5 días)
-  webCorp: 15,         // 3 semanas = 15 días
+  webBasica: 10.5,     // 1.5 semanas = 10.5 días (semanas de 7 días)
+  webCorp: 21,         // 3 semanas = 21 días
 };
 
 export const fmt = (n: number) => n.toLocaleString("es-CO");
@@ -715,6 +715,8 @@ function Calculator() {
               <div className="grid gap-3 sm:grid-cols-3">
                 {PACES.map((p) => {
                   const on = pace === p.id;
+                  // Calcular tiempo estimado para este ritmo
+                  const tiempoEstimado = formatTimeEstimate(calc.tiempoDias * (p.timeMultiplier / paceData.timeMultiplier));
                   return (
                     <button
                       key={p.id}
@@ -736,7 +738,7 @@ function Calculator() {
                       </span>
                       {p.desc && <span className="mt-1.5 block text-[13px] italic leading-snug text-parch-300/85">{p.desc}</span>}
                       <span className={`mt-1.5 block font-digital text-[10px] tracking-[0.12em] ${on ? "text-gold-300" : "text-parch-500"}`}>
-                        {p.sub.toUpperCase()}
+                        EN ALREDEDOR DE {tiempoEstimado.toUpperCase()}
                       </span>
                     </button>
                   );
