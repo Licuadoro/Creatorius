@@ -20,6 +20,16 @@ export const P = {
   garantia: 50000,
 };
 
+/** Tiempos base en días (ritmo estándar) */
+export const TIEMPOS_BASE = {
+  redaccion: 0.5,      // medio día
+  ilustracion: 2,      // 2 días
+  dibujo: 10 / 1440,   // 10 minutos en días (10/1440)
+  pagina: 1,           // 1 día
+  webBasica: 7.5,      // 1.5 semanas = 7.5 días (asumiendo semana laboral de 5 días)
+  webCorp: 15,         // 3 semanas = 15 días
+};
+
 export const fmt = (n: number) => n.toLocaleString("es-CO");
 
 export const MAX = { redaccion: 10, grande: 5, dibujo: 99, pagina: 10 };
@@ -29,25 +39,28 @@ export const PACES = [
     id: "sin",
     title: "Sin prisa",
     desc: "¡Dame un respiro! ¿No es tranquilizante?",
-    sub: "Tu web perfecta en hasta 8 semanas.",
+    sub: "Tu web perfecta en alrededor de 8 semanas, pero depende de la idea que tengas.",
     weeks: "8 semanas",
     feePct: 0,
+    timeMultiplier: 2, // doble del ritmo estándar
   },
   {
     id: "estandar",
     title: "Estandar",
     desc: "",
-    sub: "Tu web lista en hasta 4 semanas.",
+    sub: "Tu web lista en alrededor de 4 semanas, pero depende de la idea que tengas.",
     weeks: "4 semanas",
     feePct: 0,
+    timeMultiplier: 1, // ritmo estándar
   },
   {
     id: "express",
     title: "Express",
     desc: "",
-    sub: "Tu web volando en hasta 2 semanas.",
+    sub: "Tu web volando en alrededor de 2 semanas, pero depende de la idea que tengas.",
     weeks: "2 semanas",
     feePct: 10,
+    timeMultiplier: 0.9, // resta 10% del tiempo
   },
 ] as const;
 
@@ -77,7 +90,20 @@ export function calcularPacto(cfg: PactoCfg) {
     : 0;
   const expressFee = cfg.v === "express" ? Math.round(subtotal * 0.1) : 0;
   const total = subtotal + expressFee;
-  return { ambos, baseCost, rCost, gCost, dCost, pCost, gar, subtotal, ahorro, expressFee, total };
+
+  // Calcular tiempo base en días (ritmo estándar)
+  const tiempoBaseWeb = cfg.base === "basica" ? TIEMPOS_BASE.webBasica : TIEMPOS_BASE.webCorp;
+  const tiempoRedaccion = cfg.r * TIEMPOS_BASE.redaccion;
+  const tiempoIlustracion = cfg.g * TIEMPOS_BASE.ilustracion;
+  const tiempoDibujo = cfg.d * TIEMPOS_BASE.dibujo;
+  const tiempoPaginas = cfg.p * TIEMPOS_BASE.pagina;
+  const tiempoTotalBase = tiempoBaseWeb + tiempoRedaccion + tiempoIlustracion + tiempoDibujo + tiempoPaginas;
+
+  // Aplicar multiplicador de ritmo
+  const paceData = PACES.find((p) => p.id === cfg.v)!;
+  const tiempoFinal = tiempoTotalBase * paceData.timeMultiplier;
+
+  return { ambos, baseCost, rCost, gCost, dCost, pCost, gar, subtotal, ahorro, expressFee, total, tiempoDias: tiempoFinal };
 }
 
 /* ---------- sigilos dibujados a mano ---------- */
@@ -435,6 +461,27 @@ const DESTINO = "licuadorodelicuado@gmail.com";
 type EnvioStatus = "idle" | "sending" | "sent" | "fallback";
 type Errores = { nombre?: string; email?: string; idea?: string };
 
+/** Formatea días a texto legible (misma función que en Recibo.tsx) */
+function formatTimeEstimate(dias: number): string {
+  if (dias < 1) {
+    const horas = Math.round(dias * 24);
+    if (horas < 1) {
+      const minutos = Math.round(dias * 24 * 60);
+      return `${minutos} min`;
+    }
+    return `${horas} h`;
+  }
+  if (dias < 7) {
+    return `${Math.round(dias)} día${dias >= 2 ? "s" : ""}`;
+  }
+  const semanas = dias / 7;
+  if (semanas < 4) {
+    return `${semanas.toFixed(1).replace(".0", "")} semana${semanas >= 2 ? "s" : ""}`;
+  }
+  const meses = dias / 30;
+  return `${meses.toFixed(1).replace(".0", "")} mes${meses >= 2 ? "es" : ""}`;
+}
+
 function Calculator() {
   const { formatMoney, code } = useCurrency();
   const [base, setBase] = useState<"basica" | "corp">("basica");
@@ -485,6 +532,7 @@ function Calculator() {
     "Garantía de cambios (1 año)": garantia ? `Sí — ${fmt(P.garantia)} $ COP` : "No (va incluida la gratis de 1 mes)",
     "Descuento «¡Ambos!»": ambos ? `Activo — ahorro de ${fmt(calc.ahorro)} $ COP` : "No activo",
     "Ritmo de entrega": `${paceData.title} — ${paceData.sub}`,
+    "Tiempo estimado": `${formatTimeEstimate(calc.tiempoDias)} (${paceData.title})`,
     ...(calc.expressFee > 0 ? { "Recargo Exprés (+10%)": `${fmt(calc.expressFee)} $ COP` } : {}),
     "TOTAL DEL PACTO": `${fmt(calc.total)} $ COP`,
   };
@@ -729,7 +777,7 @@ function Calculator() {
                 <p key={`${calc.total}-${code}`} className="count-pop mt-2 font-digital text-[40px] leading-none text-gold-400" style={{ textShadow: "0 0 26px rgba(227,179,65,0.3)" }}>
                   {formatMoney(calc.total)}
                 </p>
-                <p className="mt-1 font-digital text-[11px] tracking-[0.18em] text-parch-500">{code} · ENTREGA EN HASTA {paceData.weeks.toUpperCase()}</p>
+                <p className="mt-1 font-digital text-[11px] tracking-[0.18em] text-parch-500">{code} · ENTREGA EN ALREDEDOR DE {formatTimeEstimate(calc.tiempoDias).toUpperCase()}, PERO DEPENDE DE LA IDEA QUE TENGAS</p>
                 {code !== "COP" && (
                   <p className="mt-2 border border-dashed border-gold-600/30 px-2.5 py-1.5 font-digital text-[9px] leading-relaxed tracking-[0.12em] text-parch-600">
                     EL PACTO SE COBRA EN PESOS COLOMBIANOS ({fmt(calc.total)} $ COP) · ESTA ES SOLO UNA TRADUCCIÓN ORIENTATIVA
