@@ -276,7 +276,7 @@ export default function Portafolio() {
       )}
 
       {/* -------- tinta y trazo: las ilustraciones -------- */}
-      <Reveal className="mt-24">
+      <Reveal id="ilustraciones" className="mt-24 scroll-mt-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="font-digital text-[11px] tracking-[0.3em] text-gold-500">
