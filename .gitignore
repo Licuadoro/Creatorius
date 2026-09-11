@@ -1,48 +1,80 @@
-```gitignore
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
+```
 # Dependencies
 node_modules/
-venv/
-.venv/
-.env
-.env.local
-*.env.*
 
-# Build directories
+# Build artifacts
 dist/
-build/
-target/
-*.log
+
+# Package lock file
+package-lock.json
+
+# Temporary files
 *.tmp
 *.swp
 *.swo
 
-# Editors
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# IDE files
 .vscode/
 .idea/
 
-# Coverage
-.coverage
+# Coverage reports
 coverage/
 htmlcov/
+.coverage
 
-# OS
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Compiled files
+*.o
+*.obj
+*.so
+*.a
+*.dll
+*.exe
+*.out
+
+# Backup files
+*~
+.#*
+
+# OS files
 .DS_Store
 Thumbs.db
 
-# Cache
-.mypy_cache/
-.pytest_cache/
-.gradle/
+# Compression files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
 ```
