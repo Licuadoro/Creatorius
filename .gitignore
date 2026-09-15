@@ -1,26 +1,74 @@
 ```
+# Build artifacts
+dist/
+build/
+
 # Dependencies
 node_modules/
 
-# Build artifacts
-dist/
+# Logs and temp files
+*.log
+*.tmp
 
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*
 
-# Package lock file
-package-lock.json
-
-# Logs
-*.log
-
-# IDE files
+# Editors
 .vscode/
 .idea/
 
-# OS generated files
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Compression files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# System files
 .DS_Store
 Thumbs.db
+
+# Testing and coverage
+.coverage
+coverage/
+htmlcov/
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+.cache/
 ```
