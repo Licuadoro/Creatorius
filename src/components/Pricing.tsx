@@ -247,9 +247,9 @@ export function Ofrendas() {
           desc={
             <>
               Ilustración hecha a mano por un gran dibujante: un toque original, cercano y orgánico que atrae usuarios.{" "}
-              <button onClick={() => document.getElementById("ilustraciones")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="link-underline text-mint-400 transition-colors hover:text-mint-300">
+              <a href="#ilustraciones" className="link-underline text-mint-400 transition-colors hover:text-mint-300">
                 Ver ejemplo.
-              </button>{" "}
+              </a>{" "}
               Si no se incluye, se usará tu material o imágenes generadas por IA.
             </>
           }
