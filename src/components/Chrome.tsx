@@ -10,14 +10,16 @@ export function Reveal({
   children,
   delay = 0,
   className = "",
+  id,
 }: {
   children: ReactNode;
   delay?: number;
   className?: string;
+  id?: string;
 }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.14);
   return (
-    <div ref={ref} className={`fade-up ${inView ? "on" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+    <div id={id} ref={ref} className={`fade-up ${inView ? "on" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
       {children}
     </div>
   );
