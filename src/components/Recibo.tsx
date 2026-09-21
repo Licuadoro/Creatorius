@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import RuneGlyph from "./RuneGlyph";
-import { RECIBO_HASH } from "../data";
+import { RECIBO_HASH, MONEDA_LISTA } from "../data";
+import { useCurrency } from "../currency";
 import { P, MAX, PACES, calcularPacto, fmt, type PaceId, type PactoCfg, TIEMPOS_BASE } from "./Pricing";
 
 type DatosCliente = { n: string; e: string; i: string };
@@ -91,6 +92,7 @@ export default function Recibo() {
   const lectura = useMemo(leerHash, []);
   const [cfg, setCfg] = useState<PactoCfg>(lectura.datos ?? DEFAULT_CFG);
   const [cliente, setCliente] = useState(lectura.datos?.n ?? "");
+  const { code, setCode, formatMoney } = useCurrency();
   const [precio, setPrecio] = useState<string>(() => {
     const c = lectura.datos;
     return c ? String(calcularPacto({ base: c.base, r: c.r, g: c.g, d: c.d, p: c.p, w: c.w, v: c.v }).total) : "";
@@ -106,6 +108,11 @@ export default function Recibo() {
   
   // Estado para tiempo personalizado (en días)
   const [tiempoPersonalizado, setTiempoPersonalizado] = useState<string>("");
+  
+  // Estado para el selector de moneda
+  const [monedaOpen, setMonedaOpen] = useState(false);
+  const [monedaQ, setMonedaQ] = useState("");
+  const monedaRef = useRef<HTMLDivElement | null>(null);
 
   const folio = useMemo(() => `R-${Math.random().toString(36).slice(2, 7).toUpperCase()}`, []);
   const fecha = useMemo(
@@ -135,6 +142,13 @@ export default function Recibo() {
     try { localStorage.setItem(LS_CUENTA, v); } catch { /* sin almacenamiento */ }
   };
 
+  // Lista filtrada de monedas
+  const monedaLista = useMemo(() => {
+    const t = monedaQ.trim().toLowerCase();
+    if (!t) return MONEDA_LISTA;
+    return MONEDA_LISTA.filter((m) => m.code.toLowerCase().includes(t) || m.name.toLowerCase().includes(t));
+  }, [monedaQ]);
+
   const filas: { label: string; valor: string; mint?: boolean }[] = [
     { label: cfg.base === "basica" ? "Web básica" : "Web corporativa (incluye 5 páginas)", valor: fmt(calc.baseCost) },
   ];
@@ -162,6 +176,23 @@ export default function Recibo() {
       setEstado("error");
     }
   };
+
+  // Efecto para cerrar el menú de moneda al hacer clic fuera
+  useMemo(() => {
+    if (!monedaOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (monedaRef.current && !monedaRef.current.contains(e.target as Node)) setMonedaOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMonedaOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [monedaOpen]);
 
   return (
     <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-24 pt-14">
@@ -283,7 +314,79 @@ export default function Recibo() {
                   placeholder="Escribe el precio pactado"
                   className="w-full bg-transparent py-3.5 font-digital text-[18px] text-gold-300 outline-none placeholder:text-parch-600"
                 />
-                <span className="shrink-0 font-digital text-[11px] tracking-[0.14em] text-parch-500">$ COP</span>
+                <div className="relative shrink-0" ref={monedaRef}>
+                  <button
+                    onClick={() => setMonedaOpen((o) => !o)}
+                    aria-expanded={monedaOpen}
+                    aria-haspopup="listbox"
+                    title="Cambiar la moneda del recibo"
+                    className={`flex items-center gap-1.5 border px-2.5 py-1.5 font-digital text-[10px] tracking-[0.14em] transition-all duration-300 ${
+                      monedaOpen
+                        ? "border-gold-400 bg-gold-400/15 text-gold-200"
+                        : "border-gold-600/40 bg-gold-400/[0.06] text-gold-300 hover:border-gold-400 hover:bg-gold-400/12"
+                    }`}
+                  >
+                    {code}
+                    <svg viewBox="0 0 12 12" className={`h-2.5 w-2.5 transition-transform duration-300 ${monedaOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M2.5 4.5 6 8l3.5-3.5" />
+                    </svg>
+                  </button>
+
+                  {monedaOpen && (
+                    <div className="menu-pop absolute right-0 top-[calc(100%+8px)] z-50 w-[280px] border border-gold-600/35 bg-ink-900 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.9)]">
+                      <div className="flex items-center justify-between border-b border-ink-700 px-3 py-2.5">
+                        <p className="font-digital text-[9px] tracking-[0.2em] text-gold-400">MONEDA DEL RECIBO</p>
+                      </div>
+                      <div className="px-3 pt-2.5">
+                        <input
+                          autoFocus
+                          type="text"
+                          value={monedaQ}
+                          onChange={(e) => setMonedaQ(e.target.value)}
+                          placeholder="Buscar… (COP, yen, euro…)"
+                          className="pacto-input py-2 text-[12px]"
+                        />
+                      </div>
+                      <ul className="menu-scroll mt-2 max-h-64 overflow-y-auto px-1.5 pb-2" role="listbox">
+                        {monedaLista.map((m) => {
+                          const activa = m.code === code;
+                          return (
+                            <li key={m.code}>
+                              <button
+                                role="option"
+                                aria-selected={activa}
+                                onClick={() => {
+                                  setCode(m.code);
+                                  setMonedaOpen(false);
+                                  setMonedaQ("");
+                                }}
+                                className={`group flex w-full items-center gap-2.5 px-2 py-1.5 text-left transition-colors duration-200 ${
+                                  activa ? "bg-gold-400/[0.12]" : "hover:bg-ink-800"
+                                }`}
+                              >
+                                <span className={`w-10 shrink-0 font-digital text-[10px] tracking-[0.12em] ${activa ? "text-gold-300" : "text-parch-300"}`}>
+                                  {m.code}
+                                </span>
+                                <span className="flex-1 truncate text-[11.5px] text-parch-500 group-hover:text-parch-300">{m.name}</span>
+                                <span className="shrink-0 font-digital text-[9px] text-parch-600">{m.symbol}</span>
+                                {activa && (
+                                  <svg viewBox="0 0 10 10" className="h-2 w-2 shrink-0 text-gold-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <path d="m1.5 5.2 2.4 2.4L8.5 2.6" />
+                                  </svg>
+                                )}
+                              </button>
+                            </li>
+                          );
+                        })}
+                        {monedaLista.length === 0 && (
+                          <li className="px-2.5 py-5 text-center text-[11.5px] italic text-parch-500">
+                            Ninguna moneda responde a ese nombre.
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => setPrecio(String(calc.total))}
@@ -291,7 +394,7 @@ export default function Recibo() {
                 className="shrink-0 border border-ink-600 bg-ink-850/80 px-4 font-digital text-[10px] tracking-[0.14em] text-parch-300 transition-all duration-300 hover:border-gold-500/60 hover:text-gold-300"
               >
                 USAR CALCULADO
-                <span className="mt-0.5 block text-[10px] text-gold-500">{fmt(calc.total)}</span>
+                <span className="mt-0.5 block text-[10px] text-gold-500">{formatMoney(calc.total)}</span>
               </button>
             </div>
           </div>
@@ -451,7 +554,7 @@ export default function Recibo() {
                     <p className="font-digital text-[9px] tracking-[0.2em] text-parch-600">TRAS NEGOCIACIÓN</p>
                   </div>
                   <p className="font-digital text-[38px] leading-none text-gold-300">
-                    {precioValido ? fmt(precioNum) : "—————"} <span className="text-[15px] text-parch-400">$ COP</span>
+                    {precioValido ? formatMoney(Number(precio)) : "—————"}
                   </p>
                 </div>
 
